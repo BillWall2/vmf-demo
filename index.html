@@ -18,6 +18,54 @@
         display: block;
     }
 
+    .roadmap-box {
+        margin-top: 14px;
+        padding: 12px;
+        background: #f7f7f7;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        max-width: 960px;
+    }
+
+    .roadmap-category {
+        margin-top: 12px;
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+
+    .roadmap-family {
+        margin-left: 20px;
+        margin-top: 8px;
+        font-weight: bold;
+    }
+
+    .roadmap-object {
+        margin-left: 40px;
+        margin-top: 4px;
+    }
+
+    .roadmap-object-button {
+    margin-left: 40px;
+    margin-top: 4px;
+    display: block;
+    border: none;
+    background: transparent;
+    color: #0645ad;
+    cursor: pointer;
+    padding: 4px 0;
+    font-size: 0.98em;
+    text-align: left;
+}
+
+    .roadmap-object-button:hover {
+        text-decoration: underline;
+    }
+
+    .roadmap-object-button:focus {
+        outline: 2px solid #777;
+        outline-offset: 2px;
+    }
+
     .panel {
         border: 1px solid #ccc;
         border-radius: 12px;
@@ -25,6 +73,69 @@
         margin: 16px 0;
         max-width: 1000px;
         background: #ffffff;
+    }
+
+    .preview-grid {
+    display: flex;
+    gap: 20px;
+    align-items: stretch;
+    flex-wrap: nowrap;
+    margin-top: 12px;
+    margin-bottom: 20px;
+    max-width: 1000px;
+}
+
+.preview-card {
+    flex: 1 1 0;
+    min-width: 0;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 14px;
+    background: #ffffff;
+    box-sizing: border-box;
+}
+
+.preview-card h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.preview-caption {
+    margin-top: -4px;
+    margin-bottom: 10px;
+    color: #555;
+    font-size: 0.95em;
+}
+
+.preview-box {
+    min-height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: #f7f7f7;
+    border-radius: 10px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.preview-box img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    display: block;
+}
+
+@media (max-width: 700px) {
+    .preview-grid {
+        flex-direction: column;
+        flex-wrap: nowrap;
+    }
+}
+    @media (max-width: 800px) {
+        .preview-grid {
+            flex-direction: column;
+        }
     }
 </style>
 
@@ -35,7 +146,23 @@
 <h1>Visual Mathematics Framework</h1>
 
 <div class="hero">
-    <img src="media/vmfBanner.png" alt="Visual Mathematics Framework banner">
+    <img src="media/vmfBanner.jpg" alt="Visual Mathematics Framework banner">
+</div>
+
+<div class="panel">
+    <h2>VMF Roadmap</h2>
+
+    <p>
+        This roadmap shows the current Category → Family → Object structure of the Visual Mathematics Framework.
+    </p>
+
+    <button onclick="toggleRoadmap()">
+        Show / Hide Roadmap
+    </button>
+
+    <div id="roadmapBox" class="roadmap-box" style="display:none;">
+        Roadmap will appear here.
+    </div>
 </div>
 
 <p>
@@ -46,6 +173,7 @@
 <div id="designPage">
 
 <div class="panel">
+
 
 <h2>Object Selection</h2>
 
@@ -94,13 +222,27 @@ Object:
             width:500px">
 </div>
 
-<h2>Demonstration Preview</h2>
+<h2>Demonstration Previews</h2>
 
-<div id="demoBox" 
-    style="margin-bottom:20px; padding:10px; border:1px solid #ccc; min-height:220px;">
-    <em>No demonstration preview available.</em>
+<div id="previewArea" class="preview-grid">
+
+    <div id="geoGebraPreviewCard" class="preview-card">
+        <h3>GeoGebra Preview</h3>
+        <p class="preview-caption">Interactive mathematical construction</p>
+        <div id="geoGebraPreviewBox" class="preview-box">
+            <p>No GeoGebra preview selected.</p>
+        </div>
+    </div>
+
+    <div id="blenderPreviewCard" class="preview-card">
+        <h3>Blender Preview</h3>
+        <p class="preview-caption">Rendered presentation model</p>
+        <div id="blenderPreviewBox" class="preview-box">
+            <p>No Blender preview selected.</p>
+        </div>
+    </div>
+
 </div>
-
 
 <div id="torusSurfacePanel" style="display:none;">
 
@@ -272,38 +414,30 @@ Torus minor radius:
 
 <div id="doubleHelixPanel" style="display:none;">
 
-<h2>Double Helix</h2>
+<h2>DNA / Double Helix</h2>
 
-<label>Name:</label>
-<input type="text" id="doubleHelixName" value="DH"><br><br>
-
-<label>Radius:</label>
-<input type="number" id="doubleHelixRadius" value="2" step="0.1"><br><br>
-
-<label>Pitch:</label>
-<input type="number" id="doubleHelixPitch" value="0.35" step="0.05"><br><br>
-
-<label>Turns:</label>
-<input type="number" id="doubleHelixTurns" value="5" step="1"><br><br>
-
-<p>SNP rung index:
-<input type="number" id="dnaSNPIndex" value="12" min="0" step="1">
+<p>Name:
+<input type="text" id="doubleHelixName" value="DH">
 </p>
 
-<p>DNA rung count:
-<input type="number" id="dnaRungCount" value="30" min="4" step="1">
-</p>
-
-<p>DNA turns:
-<input type="number" id="dnaTurns" value="5" min="1" step="1">
-</p>
-
-<p>DNA radius:
+<p>Radius:
 <input type="number" id="dnaRadius" value="2" min="0.5" step="0.1">
 </p>
 
-<p>DNA pitch:
+<p>Pitch:
 <input type="number" id="dnaPitch" value="0.35" min="0.05" step="0.05">
+</p>
+
+<p>Turns:
+<input type="number" id="dnaTurns" value="5" min="1" step="1">
+</p>
+
+<p>Rung count:
+<input type="number" id="dnaRungCount" value="30" min="4" step="1">
+</p>
+
+<p>SNP rung index:
+<input type="number" id="dnaSNPIndex" value="12" min="0" step="1">
 </p>
 
 </div>
