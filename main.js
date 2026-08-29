@@ -18,7 +18,9 @@ const framework = {
             { value: "cube", label: "Cube" },
             { value: "octahedron", label: "Octahedron" },
             { value: "icosahedron", label: "Icosahedron" },
-            { value: "dodecahedron", label: "Dodecahedron" }
+            { value: "dodecahedron", label: "Dodecahedron" },
+            { value: "sierpinskiIcosahedron", label: "Sierpinski Icosahedron" },
+            { value: "sierpinskiIcosahedronScene", label: "Sierpinski Icosahedron with Sphere and Torus" }
         ],
 
         "Lemniscates": [
@@ -111,6 +113,135 @@ function addOption(selectElement, value, label) {
     option.value = value;
     option.textContent = label;
     selectElement.appendChild(option);
+}
+
+function buildRoadmap() {
+    const roadmapBox = document.getElementById("roadmapBox");
+
+    if (!roadmapBox) {
+        return;
+    }
+
+    let html = "";
+
+    const categories = Object.keys(framework);
+
+    for (let c = 0; c < categories.length; c++) {
+        const categoryKey = categories[c];
+        const categoryLabel = formatRoadmapLabel(categoryKey);
+
+        html += '<div class="roadmap-category">' + escapeHTML(categoryLabel) + '</div>';
+
+        const families = Object.keys(framework[categoryKey]);
+
+        for (let f = 0; f < families.length; f++) {
+            const familyName = families[f];
+
+            html += '<div class="roadmap-family">' + escapeHTML(familyName) + '</div>';
+
+            const objects = framework[categoryKey][familyName];
+
+            for (let o = 0; o < objects.length; o++) {
+                html +=
+                    '<button type="button" class="roadmap-object-button" ' +
+                    'data-category="' + escapeHTML(categoryKey) + '" ' +
+                    'data-family="' + escapeHTML(familyName) + '" ' +
+                    'data-object="' + escapeHTML(objects[o].value) + '">' +
+                    escapeHTML(objects[o].label) +
+                    '</button>';
+            }
+        }
+    }
+
+    roadmapBox.innerHTML = html;
+
+    const buttons = roadmapBox.querySelectorAll(".roadmap-object-button");
+
+    for (let i = 0; i < buttons.length; i++) {
+        buttons[i].addEventListener("click", function () {
+            selectRoadmapObject(
+                this.dataset.category,
+                this.dataset.family,
+                this.dataset.object
+            );
+        });
+    }
+}
+
+function selectRoadmapObject(categoryKey, familyName, objectValue) {
+    const categorySelect = document.getElementById("category");
+    const familySelect = document.getElementById("family");
+    const objectSelect = document.getElementById("objectType");
+
+    if (!categorySelect || !familySelect || !objectSelect) {
+        return;
+    }
+
+    categorySelect.value = categoryKey;
+
+    updateFamilyOptions();
+
+    familySelect.value = familyName;
+
+    updateObjectOptions();
+
+    objectSelect.value = objectValue;
+
+    updateObjectPanel();
+    updateObjectTitle();
+
+    const objectTitle = document.getElementById("objectTitle");
+
+    if (objectTitle) {
+        objectTitle.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+    }
+}
+
+function escapeHTML(value) {
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function toggleRoadmap() {
+    const roadmapBox = document.getElementById("roadmapBox");
+
+    if (!roadmapBox) {
+        return;
+    }
+
+    if (roadmapBox.style.display === "none") {
+        buildRoadmap();
+        roadmapBox.style.display = "block";
+    } else {
+        roadmapBox.style.display = "none";
+    }
+}
+
+function formatRoadmapLabel(key) {
+    if (key === "geometry") {
+        return "Geometry";
+    }
+
+    if (key === "stochastic") {
+        return "Stochastic";
+    }
+
+    if (key === "transformations") {
+        return "Transformations";
+    }
+
+    if (key === "scientificModels") {
+        return "Scientific Models";
+    }
+
+    return key;
 }
 
 function updateFamilyOptions() {
@@ -213,8 +344,6 @@ function updateObjectPanel() {
     document.getElementById("mobiusStripPanel").style.display = "block";
 } else if (objectType === "helix") {
     document.getElementById("helixPanel").style.display = "block";
-} else if (objectType === "doubleHelix") {
-    document.getElementById("doubleHelixPanel").style.display = "block";
 } else if (
     objectType === "doubleHelix" ||
     objectType === "doubleHelixBasePairs" ||
@@ -278,7 +407,10 @@ function updateObjectPanel() {
         objectType === "sierpinskiTriangle"
     ) {
         document.getElementById("hilbertPanel").style.display = "block";
-    } else if (objectType === "sierpinskiIcosahedron") {
+    } else if (
+        objectType === "sierpinskiIcosahedron" ||
+        objectType === "sierpinskiIcosahedronScene"
+    ) {
         document.getElementById("blenderSIPanel").style.display = "block";
     } else if (objectType === "birthDeathProcess") {
         document.getElementById("birthDeathPanel").style.display = "block";
@@ -301,6 +433,7 @@ function updateObjectPanel() {
     updateDescription();
     updateFormula();
     updateDemo();
+    updatePreviews();
 }
 
 function generateCode() {
@@ -386,7 +519,10 @@ function generateCode() {
         generateGeoGebraKochSnowflake();
     } else if (objectType === "sierpinskiTriangle") {
         generateGeoGebraSierpinskiTriangle();
-    } else if (objectType === "sierpinskiIcosahedron") {
+    } else if (
+        objectType === "sierpinskiIcosahedron" ||
+        objectType === "sierpinskiIcosahedronScene"
+    ) {
         generateGeoGebraSierpinskiIcosahedron();
     } else if (objectType === "birthDeathProcess") {
         generateGeoGebraBirthDeathProcess();
@@ -415,7 +551,10 @@ function generateCode() {
 
 window.onload = function() {
     updateFamilyOptions();
+    buildRoadmap();
 };
+
+
 
 function generateGeoGebraGerono() {
     let name = document.getElementById("geronoName").value;
@@ -1441,6 +1580,16 @@ function updateDescription() {
         text = "A three-dimensional spiral curve winding around an axis. The radius controls the width of the spiral, while the pitch controls how quickly it rises.";
             break;
 
+        case "doubleHelix":
+            text =
+                "A pair of three-dimensional helical curves winding around the same axis, phase-shifted by pi. This gives the basic double-helix form.";
+            break;
+
+        case "doubleHelixBasePairs":
+            text =
+                "A simplified DNA-style double helix with cross-rungs representing base-pair connections between the two helical strands.";
+            break;
+
         case "dnaDoubleHelixSNP":
         text = "A simplified DNA double helix with one highlighted SNP site. The two coloured helical strands represent DNA strands, grey rungs represent base-pair positions, and one yellow rung marks a selected single-nucleotide polymorphism.";
             break;
@@ -1585,6 +1734,10 @@ function updateDescription() {
         text = "A regular icosahedron whose triangular faces are decorated with Sierpinski-style recursive triangle patterns. It combines polyhedral geometry with fractal subdivision.";
         break;
 
+        case "sierpinskiIcosahedronScene":
+            text = "A Blender scene based on a Sierpinski-style icosahedral structure, with spherical vertices, connecting edges, a central sphere, and an added torus for visual structure and rotation.";
+        break;
+
         case "birthDeathProcess":
             text =
         "A continuous-time branching process in which each individual gives birth or dies after exponentially distributed waiting times.";
@@ -1631,172 +1784,347 @@ function updateDescription() {
 }
 
 function updateDemo() {
+    // Legacy function retained during transition to updatePreviews().
+    // The new dual-preview system is handled by updatePreviews().
+}
 
-    let objectType = document.getElementById("objectType").value;
-    let demo = "";
+function updatePreviews() {
+    const objectType = document.getElementById("objectType").value;
+
+    const geoGebraPreviewBox = document.getElementById("geoGebraPreviewBox");
+    const blenderPreviewBox = document.getElementById("blenderPreviewBox");
+
+    if (!geoGebraPreviewBox || !blenderPreviewBox) {
+        return;
+    }
+
+    let geoGebraPreview = "<p>GeoGebra preview not yet available.</p>";
+    let blenderPreview = "<p>Blender preview not yet available.</p>";
 
     switch (objectType) {
 
-        case "gerono":
-            demo = '<img src="image/gerono.png" width="500">';
-            break;
-
-        case "torusSurface":
-            demo = '<img src="image/torus.png" width="500">';
-            break;
-
-        case "tetrahedron":
-            demo = '<img src="media/tetrahedron.png" style="max-width:350px; height:auto;">';
-        break;
-
-        case "cube":
-         demo = '<img src="media/cube.png" style="max-width:350px; height:auto;">';
-        break;
-
-        case "octahedron":
-            demo = '<img src="media/octahedron.png" style="max-width:350px; height:auto;">';
-        break;
-
-        case "icosahedron":
-            demo = '<img src="media/icosahedron.png" style="max-width:350px; height:auto;">';
-        break;
-
-        case "dodecahedron":
-            demo = '<img src="media/dodecahedron.png" style="max-width:350px; height:auto;">';
-        break;
-
-        case "mobiusStrip":
-            demo = '<img src="media/mobiusStrip.png" width="500">';
-        break;
-
-        case "helix":
-            demo = '<img src="media/helix.png" width="500">';
-        break;
-
-        case "dnaDoubleHelixSNP":
-            demo = '<img src="media/dnaDoubleHelixSNP.png" width="500">';
+         case "gerono":
+            geoGebraPreview =
+                '<img src="image/gerono.png" alt="GeoGebra Lemniscate of Gerono preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
         break;
 
         case "booth":
-            demo = '<img src="image/booth.png" width="500">';
-            break;
+            geoGebraPreview =
+                '<img src="image/booth.png" alt="GeoGebra Booth lemniscate preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            
+        break;
 
-        case "bernoulli":
-            demo = '<img src="image/bernoulli.png" width="500">';
-            break;
+         case "bernoulli":
+            geoGebraPreview =
+                '<img src="image/bernoulli.png" alt="GeoGebra Bernoulli lemniscate preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+        break;
 
         case "cosRose":
-            demo = '<img src="image/cosRose.png" width="500">';
-            break;
+            geoGebraPreview =
+                '<img src="image/cosRose.png" alt="GeoGebra cosine rose preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+        break;
 
         case "sinRose":
-            demo = '<img src="image/sinRose.png" width="500">';
-            break;
-
-        case "hilbertCurve":
-            demo = '<img src="media/hilbertCurve.png" width="500">';
-            break;
-
-        case "kochCurve":
-            demo = '<img src="media/kochCurve.png" width="500">';
-            break;
-
-        case "kochSnowflake":
-            demo = '<img src="media/kochSnowflake.png" width="500">';
-            break;
-
-        case "sierpinskiTriangle":
-            demo = '<img src="media/sierpinskiTriangle.png" width="500">';
-            break;
-
-        case "sierpinskiIcosahedron":
-            demo = '<img src="media/sierpinskiIcosahedron.png" width="500">';
+            geoGebraPreview =
+                '<img src="image/sinRose.png" alt="GeoGebra sine rose preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
         break;
+
+         case "torusSurface":
+            geoGebraPreview =
+                '<img src="image/torus.png" alt="GeoGebra torus surface preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+        break;
+
+        case "tetrahedron":
+            geoGebraPreview =
+                '<img src="media/tetrahedron.png" alt="GeoGebra tetrahedron preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
+
+         case "cube":
+            geoGebraPreview =
+                '<img src="media/cube.png" alt="GeoGebra cube preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
+
+        case "octahedron":
+            geoGebraPreview =
+                '<img src="media/octahedron.png" alt="GeoGebra octahedron preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
+
+        case "icosahedron":
+            geoGebraPreview =
+                '<img src="media/icosahedron.png" alt="GeoGebra icosahedron preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
+
+        case "dodecahedron":
+            geoGebraPreview =
+                '<img src="media/dodecahedron.png" alt="GeoGebra dodecahedron preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
+
+            case "mobiusStrip":
+            geoGebraPreview =
+                '<img src="media/mobiusStrip.png" alt="GeoGebra Mobius strip preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
+
+         case "helix":
+            geoGebraPreview =
+                '<img src="media/helix.png" alt="GeoGebra helix preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
+
+            case "doubleHelix":
+            geoGebraPreview =
+                '<img src="media/doubleHelix.png" alt="GeoGebra double helix preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
+
+            case "doubleHelixBasePairs":
+            geoGebraPreview =
+                '<img src="media/doubleHelixBasePairs.png" alt="GeoGebra DNA double helix with base pairs preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
+
+            case "dnaDoubleHelixSNP":
+                geoGebraPreview = '<img src="media/dnaDoubleHelixSNP_geogebra.png" alt="GeoGebra DNA Double Helix with SNP preview">';
+                blenderPreview = '<img src="media/dnaDoubleHelixSNP_blender.png" alt="Blender DNA Double Helix with SNP preview">';
+            break;
+
+            case "hilbertCurve":
+                geoGebraPreview =
+                '<img src="media/hilbertCurve.png" alt="GeoGebra Hilbert curve preview">';
+                blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
+
+            case "kochCurve":
+                geoGebraPreview =
+                '<img src="media/kochCurve.png" alt="GeoGebra Koch curve preview">';
+                blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
+
+            case "kochSnowflake":
+                geoGebraPreview =
+                '<img src="media/kochSnowflake.png" alt="GeoGebra Koch snowflake preview">';
+                blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
+
+            case "sierpinskiTriangle":
+                geoGebraPreview =
+                '<img src="media/sierpinskiTriangle.png" alt="GeoGebra Sierpinski triangle preview">';
+                blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
+
+            case "sierpinskiIcosahedron":
+                geoGebraPreview =
+                '<img src="media/sierpinskiIcosahedron.png" alt="GeoGebra Sierpinski Icosahedron preview">';
+                blenderPreview =
+                '<img src="media/sierpinskiIcosahedron_blender.png" alt="Blender Sierpinski Icosahedron preview">';
+            break;
+
+            case "sierpinskiIcosahedronScene":
+                geoGebraPreview =
+                '<img src="media/sierpinskiIcosahedron.png" alt="GeoGebra Sierpinski Icosahedron preview">';
+                blenderPreview =
+                '<img src="media/blender_SI_with_Sphere_and_Torus.png" alt="Blender Sierpinski Icosahedron with sphere and torus preview">';
+            break;
+
+                case "archSpiral":
+            geoGebraPreview =
+                '<img src="media/archSpiral.png" alt="GeoGebra Archimedean spiral preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
+
+        case "logSpiral":
+            geoGebraPreview =
+                '<img src="media/logSpiral.png" alt="GeoGebra logarithmic spiral preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
+
+        case "fermatSpiral":
+            geoGebraPreview =
+                '<img src="media/fermatSpiral.png" alt="GeoGebra Fermat spiral preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
+
+        case "cycloid":
+            geoGebraPreview =
+                '<img src="media/cycloid.png" alt="GeoGebra cycloid preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
+
+        case "epicycloid":
+            geoGebraPreview =
+                '<img src="media/epicycloid.png" alt="GeoGebra epicycloid preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
+
+        case "hypocycloid":
+            geoGebraPreview =
+                '<img src="media/hypocycloid.png" alt="GeoGebra hypocycloid preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
+
+        case "lissajous":
+            geoGebraPreview =
+                '<img src="media/lissajous.png" alt="GeoGebra Lissajous curve preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
+
+        case "animatedLissajous":
+            geoGebraPreview =
+                '<img src="media/animatedLissajous.png" alt="GeoGebra animated Lissajous curve preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
 
         case "fibonacciSpiral":
-            demo = '<img src="media/fibonacciSpiralWithSquares.png" width="500">';
-        break;
+            geoGebraPreview =
+                '<img src="media/fibonacciSpiralWithSquares.png" alt="GeoGebra Fibonacci spiral preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
+
+        case "fibonacciTiling":
+            geoGebraPreview =
+                '<img src="media/fibonacciTiling.png" alt="GeoGebra Fibonacci tiling preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
 
         case "birthDeathProcess":
-            demo = '<img src="media/birthDeathProcess.png" width="500">';
+            geoGebraPreview =
+                '<img src="media/birthDeathProcess.png" alt="GeoGebra continuous-time birth-death process preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
             break;
 
         case "birthDeathStats":
-            demo = '<img src="media/birthDeathExtinctionStats.png" width="500">';
-        break;
+            geoGebraPreview =
+                '<img src="media/birthDeathExtinctionStats.png" alt="GeoGebra birth-death extinction statistics preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
 
         case "birthDeathSamplePaths":
-            // demo = '<img src="media/birthDeathSamplePaths.png" style="max-width:100%; border:1px solid #999;">';
-            demo = '<img src="media/birthDeathSamplePaths.png" width="500">';
-        break;
+            geoGebraPreview =
+                '<img src="media/birthDeathSamplePaths.png" alt="GeoGebra birth-death sample paths preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
 
-        case "galtonWatson":
-            demo = '<img src="media/galtonWatsonTree.png" width="500">';
+         case "galtonWatson":
+            geoGebraPreview =
+                '<img src="media/galtonWatsonTree.png" alt="GeoGebra Galton-Watson tree preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
             break;
 
         case "cellBranching":
-            demo = '<img src="media/biologicalCellBranchingLive.png" width="500">';
-        break;
+            geoGebraPreview =
+                '<img src="media/biologicalCellBranchingLive.png" alt="GeoGebra biological cell branching preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
 
         case "cellBranchingStats":
-            demo = '<img src="media/biologicalCellBranchingStats.png" width="500">';
-        break;
+            geoGebraPreview =
+                '<img src="media/biologicalCellBranchingStats.png" alt="GeoGebra biological cell branching statistics preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
 
         case "cellBranchingCombined":
-            demo = '<img src="media/biologicalCellBranchingWithStats.png" width="500">';
-        break;
+            geoGebraPreview =
+                '<img src="media/biologicalCellBranchingWithStats.png" alt="GeoGebra biological cell branching with statistics preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
 
-        case "reactionDiffusion":
-            demo = '<img src="media/reactionDiffusion.png" width="500">';
-        break;
+                case "reactionDiffusion":
+            geoGebraPreview =
+                '<img src="media/reactionDiffusion.png" alt="GeoGebra reaction-diffusion preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
 
         case "diffusionLimitedAggregation":
-            demo = '<img src="media/diffusionLimitedAggregation.png" width="500">';
-        break;
+            geoGebraPreview =
+                '<img src="media/diffusionLimitedAggregation.png" alt="GeoGebra diffusion-limited aggregation preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
 
         case "geneticDrift":
-            demo = '<img src="media/geneticDriftComparison.png" width="500">';
-        break;
-
-        case "geneticDriftBranching":
-            demo = '<img src="media/geneticDriftBranching.png" width="500">';
-        break;
-
-        case "geneticDriftBranchingAncestry":
-            demo = '<img src="media/geneticDriftBranchingAncestry.png" width="500">';
+            geoGebraPreview =
+                '<img src="media/geneticDriftComparison.png" alt="GeoGebra genetic drift frequency comparison preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
         break;
 
         case "geneticDriftGrid":
-            demo = '<img src="media/gridDriftPopulationSampling.png" width="500">';
-        break;
+            geoGebraPreview =
+                '<img src="media/gridDriftPopulationSampling.png" alt="GeoGebra genetic drift grid population preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
+
+        case "geneticDriftBranchingAncestry":
+            geoGebraPreview =
+                '<img src="media/geneticDriftBranchingAncestry.png" alt="GeoGebra genetic drift branching ancestry preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;uble
+
+        case "geneticDriftBranching":
+            geoGebraPreview =
+                '<img src="media/geneticDriftBranching.png" alt="GeoGebra allele branching Galton-Watson preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+            break;
 
         default:
-            demo = "<em>No demonstration preview available yet.</em>";
+            geoGebraPreview = "<p>GeoGebra preview not yet available for this object.</p>";
+            blenderPreview = "<p>Blender preview not yet available for this object.</p>";
+            break;
     }
 
-    document.getElementById("demoBox").innerHTML = demo;
-}
-
-function generateGeoGebraRose(kind) {
-    let name = document.getElementById("roseName").value;
-    let a = document.getElementById("roseA").value;
-    let k = document.getElementById("roseK").value;
-    let t = document.getElementById("roseParam").value;
-    let start = document.getElementById("roseStart").value;
-    let end = document.getElementById("roseEnd").value;
-
-    let radial;
-
-    if (kind === "cos") {
-        radial = `${a} cos(${k} ${t})`;
-    } else {
-        radial = `${a} sin(${k} ${t})`;
-    }
-
-    let code =
-`${name} = Curve((${radial}) cos(${t}), (${radial}) sin(${t}), ${t}, ${start}, ${end})`;
-
-    setOutputs(code);
+    geoGebraPreviewBox.innerHTML = geoGebraPreview;
+    blenderPreviewBox.innerHTML = blenderPreview;
 }
 
 function generateGeoGebraSpiral(kind) {
@@ -1828,6 +2156,7 @@ function updateFormula() {
     let formula = "";
 
     switch(objectType) {
+        
         case "gerono":
             formula = "x = a cos(t), y = a sin(t) cos(t)";
             break;
@@ -1870,6 +2199,16 @@ function updateFormula() {
         case "helix":
             formula = "x = a cos(t), y = a sin(t), z = b t";
         break;
+
+        case "doubleHelix":
+            formula =
+                "Strand 1: x = r cos(t), y = r sin(t), z = b t. Strand 2: x = r cos(t + pi), y = r sin(t + pi), z = b t.";
+            break;
+
+        case "doubleHelixBasePairs":
+            formula =
+                "Two phase-shifted helices are joined by line segments between corresponding parameter values, representing simplified base-pair rungs.";
+            break;
 
         case "dnaDoubleHelixSNP":
             formula = "Double helix: x = r cos(t), y = r sin(t), z = b t. The second strand is phase-shifted by pi. One selected rung is highlighted as the SNP site.";
@@ -2006,6 +2345,10 @@ function updateFormula() {
 
         case "sierpinskiIcosahedron":
         formula = "Each icosahedron face is a triangle with vertices A, B, and C. Sierpinski subdivision repeatedly replaces a triangle by three smaller corner triangles.";
+        break;
+        
+        case "sierpinskiIcosahedronScene":
+            formula = "The model begins with the vertices of an icosahedron. A Sierpinski-style recursive subdivision places smaller icosahedral structures at selected vertex positions. Blender then renders the structure using spheres, edges, a central sphere, torus, and animation.";
         break;
 
         case "birthDeathProcess":
