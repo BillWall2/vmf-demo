@@ -149,8 +149,7 @@
     <img src="media/vmfBanner.jpg" alt="Visual Mathematics Framework banner">
 </div>
 
-<div class="panel">
-    <h2>VMF Roadmap</h2>
+<div class="panel">   <h2>VMF Roadmap</h2>
 
     <p>
         This roadmap shows the current Category → Family → Object structure of the Visual Mathematics Framework.
@@ -172,8 +171,7 @@
 
 <div id="designPage">
 
-<div class="panel">
-
+<div id="objectSelectionPanel" class="panel">
 
 <h2>Object Selection</h2>
 
@@ -1000,29 +998,57 @@ Generate Output Code
     <button onclick="showVMFPage('designPage')">Back to Design / Preview</button>
 </p>
 
+
 <h2>GeoGebra Input Commands</h2>
-<textarea id="ggbCommandOutput" rows="14" cols="80"></textarea>
+
+<textarea
+    id="ggbCommandOutput"
+    rows="10"
+    cols="80"
+    placeholder="GeoGebra input commands will appear here."></textarea>
 
 <p>
-<button onclick="copyCommandsToClipboard()">
-Copy Commands
+<button onclick="copyGeoGebraCommands()">
+Copy GeoGebra Input Commands
 </button>
 </p>
 
-<h2>GeoGebra Global JavaScript</h2>
-<textarea id="ggbJavascriptOutput" rows="14" cols="80"></textarea>
+
+<h2>GeoGebra Button Setup</h2>
+
+<textarea
+    id="ggbButtonOutput"
+    rows="10"
+    cols="80"
+    placeholder="GeoGebra button instructions will appear here."></textarea>
 
 <p>
-<button onclick="copyJavascriptToClipboard()">
-Copy JavaScript
+<button onclick="copyGeoGebraButtons()">
+Copy GeoGebra Button Setup
+</button>
+</p>
+
+
+<h2>GeoGebra Global JavaScript</h2>
+
+<textarea
+    id="ggbJavascriptOutput"
+    rows="14"
+    cols="80"
+    placeholder="GeoGebra Global JavaScript will appear here."></textarea>
+
+<p>
+<button onclick="copyGeoGebraJavascript()">
+Copy GeoGebra Global JavaScript
 </button>
 </p>
 
 
 <h2>Blender Python Script</h2>
+
 <textarea
     id="blenderPythonOutput"
-    rows="12"
+    rows="14"
     cols="80"
     placeholder="Blender Python script will appear here. Copy it into Blender's Text Editor and run with Alt + P."></textarea>
 
@@ -1031,6 +1057,7 @@ Copy JavaScript
 Copy Blender Python
 </button>
 </p>
+
 </div>
 
 <script src="main.js?v=20260817c"></script>
