@@ -190,13 +190,13 @@ function selectRoadmapObject(categoryKey, familyName, objectValue) {
     updateObjectPanel();
     updateObjectTitle();
 
-    const objectTitle = document.getElementById("objectTitle");
+    const objectSelectionPanel = document.getElementById("objectSelectionPanel");
 
-    if (objectTitle) {
-        objectTitle.scrollIntoView({
+    if (objectSelectionPanel) {
+        objectSelectionPanel.scrollIntoView({
             behavior: "smooth",
             block: "start"
-        });
+    });
     }
 }
 
@@ -460,7 +460,7 @@ function generateCode() {
     } else if (objectType === "doubleHelix") {
         generateGeoGebraDoubleHelix();
     } else if (objectType === "doubleHelixBasePairs") {
-        generateGeoGebraDoubleHelixBasePairs();
+        generateDoubleHelixBasePairs();
     } else if (objectType === "dnaDoubleHelixSNP") {
         generateDNADoubleHelixSNP();
     } else if (objectType === "gerono") {
@@ -3637,13 +3637,18 @@ function generateGeoGebraFibonacciTiling() {
     setOutputs(code, jsCode);
 }
 
-function setOutputs(commands, code, blenderCode = "") {
+function setOutputs(commands, code, blenderCode = "", buttonInstructions = "") {
     const commandBox = document.getElementById("ggbCommandOutput");
+    const buttonBox = document.getElementById("ggbButtonOutput");
     const jsBox = document.getElementById("ggbJavascriptOutput");
     const blenderBox = document.getElementById("blenderPythonOutput");
 
     if (commandBox) {
         commandBox.value = commands || "";
+    }
+
+    if (buttonBox) {
+        buttonBox.value = buttonInstructions || "";
     }
 
     if (jsBox) {
@@ -3663,6 +3668,77 @@ function copyCommandsToClipboard() {
     let output = document.getElementById("ggbCommandOutput");
     output.select();
     navigator.clipboard.writeText(output.value);
+}
+
+function copyTextAreaToClipboard(textareaId, successMessage) {
+    const output = document.getElementById(textareaId);
+
+    if (!output) {
+        alert("Output box not found: " + textareaId);
+        return;
+    }
+
+    output.focus();
+    output.select();
+    output.setSelectionRange(0, output.value.length);
+
+    const textToCopy = output.value;
+
+    if (!textToCopy) {
+        alert("There is no text to copy in: " + textareaId);
+        return;
+    }
+
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(textToCopy)
+            .then(function () {
+                alert(successMessage);
+            })
+            .catch(function () {
+                legacyCopyTextArea(output, successMessage);
+            });
+    } else {
+        legacyCopyTextArea(output, successMessage);
+    }
+}
+
+function legacyCopyTextArea(output, successMessage) {
+    try {
+        output.focus();
+        output.select();
+        output.setSelectionRange(0, output.value.length);
+
+        const ok = document.execCommand("copy");
+
+        if (ok) {
+            alert(successMessage);
+        } else {
+            alert("Copy failed. The text has been selected; please press Ctrl+C manually.");
+        }
+    } catch (err) {
+        alert("Copy failed. The text has been selected; please press Ctrl+C manually.");
+    }
+}
+
+function copyGeoGebraCommands() {
+    copyTextAreaToClipboard(
+        "ggbCommandOutput",
+        "GeoGebra input commands copied to clipboard."
+    );
+}
+
+function copyGeoGebraButtons() {
+    copyTextAreaToClipboard(
+        "ggbButtonOutput",
+        "GeoGebra button setup copied to clipboard."
+    );
+}
+
+function copyGeoGebraJavascript() {
+    copyTextAreaToClipboard(
+        "ggbJavascriptOutput",
+        "GeoGebra Global JavaScript copied to clipboard."
+    );
 }
 
 function copyJavascriptToClipboard() {
@@ -4693,7 +4769,23 @@ function clearBirthDeath() {
     try { ggbApplet.deleteObject("BDExtinct"); } catch(e) {}
 }`;
 
-    setOutputs(commandCode, jsCode);
+    const buttonInstructions =
+`Create these GeoGebra buttons.
+
+Button label:
+Run birth-death process
+
+On Click JavaScript:
+runBirthDeathProcess();
+
+Button label:
+Clear
+
+On Click JavaScript:
+clearBirthDeathProcess();
+`;
+
+    setOutputs(commands, code, "", buttonInstructions);
 }
 
 function generateGeoGebraBirthDeathStats() {
@@ -4886,7 +4978,23 @@ function clearBirthDeathStats() {
     }
 }`;
 
-    setOutputs(commandCode, jsCode);
+    const buttonInstructions =
+`Create these GeoGebra buttons.
+
+Button label:
+Run extinction statistics
+
+On Click JavaScript:
+runBirthDeathStatistics();
+
+Button label:
+Clear statistics
+
+On Click JavaScript:
+clearBirthDeathStatistics();
+`;
+
+    setOutputs(commandCode, jsCode, "", buttonInstructions);
 }
 
 function generateGeoGebraBirthDeathSamplePaths() {
@@ -5032,7 +5140,23 @@ function clearBirthDeathSamplePaths() {
     try { ggbApplet.deleteObject("BDPathsCappedRuns"); } catch(e) {}
 }`;
 
-    setOutputs(commandCode, jsCode);
+    const buttonInstructions =
+`Create these GeoGebra buttons.
+
+Button label:
+Run sample paths
+
+On Click JavaScript:
+runBirthDeathSamplePaths();
+
+Button label:
+Clear sample paths
+
+On Click JavaScript:
+clearBirthDeathSamplePaths();
+`;
+
+    setOutputs(commandCode, jsCode, "", buttonInstructions);
 }
 
 function generateGeoGebraMobiusStrip() {
@@ -5266,6 +5390,294 @@ function styleDNABasePairs() {
 `;
 
     setOutputs(commands, code);
+}
+
+function generateDoubleHelixBasePairs() {
+    generateGeoGebraDoubleHelixBasePairs();
+
+    const dnaRadius = Number(document.getElementById("dnaRadius").value);
+    const dnaPitch = Number(document.getElementById("dnaPitch").value);
+    const dnaTurns = Number(document.getElementById("dnaTurns").value);
+    const dnaRungCount = Number(document.getElementById("dnaRungCount").value);
+
+    const commandBox = document.getElementById("ggbCommandOutput");
+    const jsBox = document.getElementById("ggbJavascriptOutput");
+
+    const existingCommands = commandBox ? commandBox.value : "";
+    const existingJS = jsBox ? jsBox.value : "";
+
+    const blenderCode = `import bpy
+import math
+from mathutils import Vector
+
+# ------------------------------------------------------------
+# Blender DNA Double Helix with Base Pairs
+# Generated by the Visual Mathematics Framework
+# ------------------------------------------------------------
+
+bpy.ops.object.select_all(action='SELECT')
+bpy.ops.object.delete(use_global=False)
+
+RADIUS = ${dnaRadius}
+PITCH = ${dnaPitch}
+TURNS = ${dnaTurns}
+RUNG_COUNT = ${dnaRungCount}
+
+POINTS_PER_TURN = 72
+TOTAL_POINTS = int(TURNS * POINTS_PER_TURN)
+HEIGHT_PER_TURN = PITCH * 7.0
+TOTAL_HEIGHT = TURNS * HEIGHT_PER_TURN
+
+BACKBONE_BEVEL = 0.09
+RUNG_RADIUS = 0.035
+BASE_INSET = 0.36
+BASE_BLOCK_SIZE = (0.42, 0.24, 0.24)
+
+ANIMATION_FRAMES = 240
+
+if RUNG_COUNT < 4:
+    RUNG_COUNT = 4
+
+def make_material(name, color, metallic=0.0, roughness=0.35):
+    mat = bpy.data.materials.new(name=name)
+    mat.use_nodes = True
+
+    bsdf = mat.node_tree.nodes.get("Principled BSDF")
+
+    if bsdf:
+        bsdf.inputs["Base Color"].default_value = color
+        bsdf.inputs["Metallic"].default_value = metallic
+        bsdf.inputs["Roughness"].default_value = roughness
+
+    return mat
+
+mat_backbone_1 = make_material("Backbone blue", (0.12, 0.38, 0.95, 1.0), roughness=0.25)
+mat_backbone_2 = make_material("Backbone violet", (0.72, 0.25, 0.95, 1.0), roughness=0.25)
+mat_rung = make_material("Rung grey", (0.55, 0.60, 0.70, 1.0), roughness=0.45)
+
+mat_A = make_material("A green", (0.05, 0.75, 0.18, 1.0))
+mat_T = make_material("T red", (0.92, 0.12, 0.12, 1.0))
+mat_G = make_material("G blue", (0.08, 0.35, 0.95, 1.0))
+mat_C = make_material("C orange", (1.0, 0.50, 0.05, 1.0))
+
+base_materials = {
+    "A": mat_A,
+    "T": mat_T,
+    "G": mat_G,
+    "C": mat_C
+}
+
+base_pairs = [
+    ("A", "T"),
+    ("G", "C"),
+    ("T", "A"),
+    ("C", "G")
+]
+
+all_objects = []
+
+def helix_point(theta, phase=0.0):
+    x = RADIUS * math.cos(theta + phase)
+    y = RADIUS * math.sin(theta + phase)
+    z = TOTAL_HEIGHT * (theta / (2 * math.pi * TURNS)) - TOTAL_HEIGHT / 2
+    return Vector((x, y, z))
+
+def create_curve_object(name, points, bevel_depth, material):
+    curve = bpy.data.curves.new(name=name, type='CURVE')
+    curve.dimensions = '3D'
+    curve.resolution_u = 2
+    curve.bevel_depth = bevel_depth
+    curve.bevel_resolution = 5
+
+    spline = curve.splines.new('POLY')
+    spline.points.add(len(points) - 1)
+
+    for p, co in zip(spline.points, points):
+        p.co = (co.x, co.y, co.z, 1.0)
+
+    obj = bpy.data.objects.new(name, curve)
+    bpy.context.collection.objects.link(obj)
+    obj.data.materials.append(material)
+
+    all_objects.append(obj)
+    return obj
+
+def create_cylinder_between(name, p1, p2, radius, material):
+    mid = (p1 + p2) / 2
+    direction = p2 - p1
+    length = direction.length
+
+    bpy.ops.mesh.primitive_cylinder_add(
+        vertices=24,
+        radius=radius,
+        depth=length,
+        location=mid
+    )
+
+    obj = bpy.context.object
+    obj.name = name
+
+    obj.rotation_mode = 'QUATERNION'
+    obj.rotation_quaternion = direction.to_track_quat('Z', 'Y')
+
+    obj.data.materials.append(material)
+
+    all_objects.append(obj)
+    return obj
+
+def create_base_block(name, location, direction, size, material):
+    bpy.ops.mesh.primitive_cube_add(size=1, location=location)
+
+    obj = bpy.context.object
+    obj.name = name
+
+    obj.dimensions = size
+    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+
+    direction = Vector(direction).normalized()
+    obj.rotation_mode = 'QUATERNION'
+    obj.rotation_quaternion = direction.to_track_quat('X', 'Z')
+
+    obj.data.materials.append(material)
+
+    bevel = obj.modifiers.new(name="Soft rounded edges", type='BEVEL')
+    bevel.width = 0.06
+    bevel.segments = 5
+
+    obj.modifiers.new(name="Weighted normals", type='WEIGHTED_NORMAL')
+
+    all_objects.append(obj)
+    return obj
+
+strand_1_points = []
+strand_2_points = []
+
+for i in range(TOTAL_POINTS + 1):
+    theta = 2 * math.pi * TURNS * i / TOTAL_POINTS
+    strand_1_points.append(helix_point(theta, phase=0.0))
+    strand_2_points.append(helix_point(theta, phase=math.pi))
+
+create_curve_object("DNA_Backbone_1", strand_1_points, BACKBONE_BEVEL, mat_backbone_1)
+create_curve_object("DNA_Backbone_2", strand_2_points, BACKBONE_BEVEL, mat_backbone_2)
+
+for i in range(RUNG_COUNT):
+    theta = 2 * math.pi * TURNS * i / (RUNG_COUNT - 1)
+
+    left_backbone = helix_point(theta, phase=0.0)
+    right_backbone = helix_point(theta, phase=math.pi)
+
+    center = (left_backbone + right_backbone) / 2
+    rung_direction = right_backbone - left_backbone
+
+    left_base_pos = left_backbone.lerp(center, BASE_INSET)
+    right_base_pos = right_backbone.lerp(center, BASE_INSET)
+
+    pair = base_pairs[i % len(base_pairs)]
+
+    create_cylinder_between(
+        "Rung_" + str(i),
+        left_backbone,
+        right_backbone,
+        RUNG_RADIUS,
+        mat_rung
+    )
+
+    create_base_block(
+        "BaseL_" + str(i) + "_" + pair[0],
+        left_base_pos,
+        rung_direction,
+        BASE_BLOCK_SIZE,
+        base_materials[pair[0]]
+    )
+
+    create_base_block(
+        "BaseR_" + str(i) + "_" + pair[1],
+        right_base_pos,
+        rung_direction,
+        BASE_BLOCK_SIZE,
+        base_materials[pair[1]]
+    )
+
+dna_empty = bpy.data.objects.new("DNA_BasePairs_Rotation_Empty", None)
+bpy.context.collection.objects.link(dna_empty)
+
+for obj in all_objects:
+    obj.parent = dna_empty
+
+dna_empty.rotation_euler = (0, 0, 0)
+dna_empty.keyframe_insert(data_path="rotation_euler", frame=1)
+
+dna_empty.rotation_euler = (0, 0, 2 * math.pi)
+dna_empty.keyframe_insert(data_path="rotation_euler", frame=ANIMATION_FRAMES)
+
+try:
+    action = dna_empty.animation_data.action
+
+    if hasattr(action, "fcurves"):
+        for curve in action.fcurves:
+            for keyframe in curve.keyframe_points:
+                keyframe.interpolation = 'LINEAR'
+except Exception:
+    pass
+
+scene = bpy.context.scene
+scene.frame_start = 1
+scene.frame_end = ANIMATION_FRAMES
+scene.frame_set(1)
+
+bpy.ops.object.light_add(type='AREA', location=(0, -5, 6))
+key = bpy.context.object
+key.name = "Key light"
+key.data.energy = 4500
+key.data.size = 5
+
+bpy.ops.object.light_add(type='AREA', location=(-5, 4, 4))
+fill = bpy.context.object
+fill.name = "Fill light"
+fill.data.energy = 2200
+fill.data.size = 6
+
+bpy.ops.object.light_add(type='POINT', location=(3, 5, 5))
+rim = bpy.context.object
+rim.name = "Rim light"
+rim.data.energy = 1200
+
+bpy.ops.object.camera_add(location=(0, -8.5, 3.2), rotation=(math.radians(68), 0, 0))
+camera = bpy.context.object
+scene.camera = camera
+
+world = scene.world or bpy.data.worlds.new("World")
+scene.world = world
+world.use_nodes = True
+
+bg = world.node_tree.nodes.get("Background")
+
+if bg:
+    bg.inputs[0].default_value = (0.05, 0.05, 0.075, 1.0)
+    bg.inputs[1].default_value = 1.1
+
+scene.render.engine = 'CYCLES'
+
+try:
+    scene.cycles.samples = 96
+except Exception:
+    pass
+
+scene.render.resolution_x = 1280
+scene.render.resolution_y = 720
+scene.render.fps = 24
+
+scene.view_settings.view_transform = 'Filmic'
+scene.view_settings.look = 'Medium High Contrast'
+scene.view_settings.exposure = 0.6
+scene.view_settings.gamma = 1.0
+
+scene.frame_set(1)
+
+print("VMF DNA Double Helix with Base Pairs created.")
+`;
+
+    setOutputs(existingCommands, existingJS, blenderCode);
 }
 
 function generateGeoGebraDoubleHelix() {
@@ -9897,8 +10309,41 @@ function updateGDComparisonText(
     gdWriteText("GDTextLargeDrifting", "Still drifting: " + largeDrifting, 10.2, -0.5);
 }`;
 
-    document.getElementById("descriptionBox").innerHTML = instructions;
-    setOutputs(commands, code);
+    const buttonInstructions =
+`Create these GeoGebra buttons.
+
+Button label:
+Initialise
+
+On Click JavaScript:
+initialiseGeneticDrift();
+
+Button label:
+Step one generation
+
+On Click JavaScript:
+stepGeneticDrift();
+
+Button label:
+Run 10 generations
+
+On Click JavaScript:
+runGeneticDriftGenerations(10);
+
+Button label:
+Run until fixation
+
+On Click JavaScript:
+runGeneticDriftUntilFixation();
+
+Button label:
+Clear
+
+On Click JavaScript:
+clearGeneticDrift();
+`;
+
+    setOutputs(commands, code, "", buttonInstructions);
 }
 
 function generateGeoGebraGeneticDriftBranching() {
@@ -10573,8 +11018,23 @@ function runGeneticDriftBranchingStats() {
     );
 }`;
 
-    document.getElementById("descriptionBox").innerHTML = instructions;
-    setOutputs(commands, code);
+const buttonInstructions =
+`Create these GeoGebra buttons.
+
+Button label:
+Generate allele branching tree
+
+On Click JavaScript:
+generateGeneticDriftBranching();
+
+Button label:
+Clear
+
+On Click JavaScript:
+clearGeneticDriftBranching();
+`;
+
+    setOutputs(commands, code, "", buttonInstructions);
 }
 
 function generateGeoGebraGeneticDriftGrid() {
@@ -11147,11 +11607,47 @@ function runGeneticDriftGridSteps(numberOfSteps) {
     drawGDFrequencyPlot();
 }`;
 
-    let blenderCode =
-`# Blender Python placeholder
-# A Blender version of Genetic Drift: Grid Population can be added later.`;
+const buttonInstructions =
+`Create these GeoGebra buttons.
 
-    setOutputs(commands, code, blenderCode);
+Button label:
+Initialise grid
+
+On Click JavaScript:
+initialiseGeneticDriftGrid();
+
+Button label:
+Sample one allele
+
+On Click JavaScript:
+sampleOneGeneticDriftAllele();
+
+Button label:
+Sample 10 alleles
+
+On Click JavaScript:
+sampleTenGeneticDriftAlleles();
+
+Button label:
+Complete next generation
+
+On Click JavaScript:
+completeGeneticDriftNextGeneration();
+
+Button label:
+Accept generation
+
+On Click JavaScript:
+acceptGeneticDriftGeneration();
+
+Button label:
+Clear
+
+On Click JavaScript:
+clearGeneticDriftGrid();
+`;
+
+    setOutputs(commands, code, "", buttonInstructions);
 }
 
 function generateGeoGebraGeneticDriftBranchingAncestry() {
@@ -11737,9 +12233,50 @@ function runGDBUntilFixation() {
     drawGDBFrequencyPlot();
 }`;
 
-    let blenderCode =
-`# Blender Python placeholder
-# A Blender version of Genetic Drift: Branching Ancestry can be added later.`;
+const buttonInstructions =
+`Create these GeoGebra buttons.
 
-    setOutputs(commands, code, blenderCode);
+Button label:
+Initialise
+
+On Click JavaScript:
+initialiseGeneticDriftBranching();
+
+Button label:
+Sample next generation
+
+On Click JavaScript:
+sampleGDBNextGeneration();
+
+Button label:
+Accept generation
+
+On Click JavaScript:
+acceptGDBNextGeneration();
+
+Button label:
+Step one generation
+
+On Click JavaScript:
+stepGDBGeneration();
+
+Button label:
+Run 10 generations
+
+On Click JavaScript:
+runGDBGenerations(10);
+
+Button label:
+Run until fixation
+
+On Click JavaScript:
+runGDBUntilFixation();
+
+Button label:
+Clear
+
+On Click JavaScript:
+clearGeneticDriftBranching();
+`;
+    setOutputs(commands, code, blenderCode, buttonInstructions);
 }
