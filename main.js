@@ -2047,7 +2047,7 @@ function updatePreviews() {
 
             case "sierpinskiIcosahedronScene":
                 geoGebraPreview =
-                '<img src="media/sierpinskiIcosahedron.png" alt="GeoGebra Sierpinski Icosahedron preview">';
+                "<p>GeoGebra preview not yet available for this object.</p>";
                 blenderPreview =
                 '<img src="media/blender_SI_with_Sphere_and_Torus.png" alt="Blender Sierpinski Icosahedron with sphere and torus preview">';
             break;
