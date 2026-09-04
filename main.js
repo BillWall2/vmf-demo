@@ -3,7 +3,8 @@ const framework = {
 
         "Surfaces": [
             { value: "torusSurface", label: "Torus Surface" },
-            { value: "mobiusStrip", label: "Möbius Strip" }
+            { value: "mobiusStrip", label: "Möbius Strip" },
+            { value: "torusDoubleHelix", label: "Torus with Double Helix" }
         ],
 
         "3D Curves": [
@@ -98,6 +99,10 @@ const framework = {
             { value: "geneticDriftGrid", label: "Genetic Drift: Grid Population" },
             { value: "geneticDriftBranchingAncestry", label: "Genetic Drift: Branching Ancestry" },
             { value: "geneticDriftBranching", label: "Allele Branching: Galton-Watson" }
+        ],
+
+        "Epidemiology": [
+            { value: "epidemicBranching", label: "Epidemic Branching Process" }
         ]
     
     }
@@ -317,6 +322,8 @@ function updateObjectPanel() {
     document.getElementById("geneticDriftGridPanel").style.display = "none";
     document.getElementById("geneticDriftBranchingPanel").style.display = "none";
     document.getElementById("geneticDriftBranchingAncestryPanel").style.display = "none";
+    document.getElementById("epidemicBranchingPanel").style.display = "none";
+    document.getElementById("torusDoubleHelixPanel").style.display = "none";
     document.getElementById("mobiusStripPanel").style.display = "none";
     document.getElementById("cellBranchingStatsPanel").style.display = "none";
     document.getElementById("tetrahedronPanel").style.display = "none";
@@ -330,6 +337,8 @@ function updateObjectPanel() {
     
  if (objectType === "torusSurface") {
         document.getElementById("torusSurfacePanel").style.display = "block";
+} else if (objectType === "torusDoubleHelix") {
+    document.getElementById("torusDoubleHelixPanel").style.display = "block";
 } else if (objectType === "tetrahedron") {
     document.getElementById("tetrahedronPanel").style.display = "block";
 } else if (objectType === "cube") {
@@ -342,6 +351,8 @@ function updateObjectPanel() {
     document.getElementById("dodecahedronPanel").style.display = "block";
 } else if (objectType === "mobiusStrip") {
     document.getElementById("mobiusStripPanel").style.display = "block";
+} else if (objectType === "epidemicBranching") {
+    document.getElementById("epidemicBranchingPanel").style.display = "block";
 } else if (objectType === "helix") {
     document.getElementById("helixPanel").style.display = "block";
 } else if (
@@ -418,8 +429,12 @@ function updateObjectPanel() {
         document.getElementById("birthDeathStatsPanel").style.display = "block";
     } else if (objectType === "birthDeathSamplePaths") {
         document.getElementById("birthDeathSamplePathsPanel").style.display = "block";
-    } else if (objectType === "geneticDrift") {
-        generateGeoGebraGeneticDrift();
+        } else if (objectType === "reactionDiffusion") {
+            // No special input panel yet.
+        } else if (objectType === "diffusionLimitedAggregation") {
+            // No special input panel yet.
+        } else if (objectType === "geneticDrift") {
+            // No special input panel yet.
     } else if (objectType === "geneticDriftGrid") {
         generateGeoGebraGeneticDriftGrid();
     } else if (objectType === "geneticDriftBranchingAncestry") {
@@ -441,6 +456,8 @@ function generateCode() {
 
     if (objectType === "torusSurface") {
         generateGeoGebraTorusSurface();
+    } else if (objectType === "torusDoubleHelix") {
+        generateGeoGebraTorusDoubleHelix();
     } else if (objectType === "tetrahedron") {
         generateGeoGebraTetrahedron();
     } else if (objectType === "tetrahedron") {
@@ -534,6 +551,8 @@ function generateCode() {
         generateGeoGebraReactionDiffusion();
     } else if (objectType === "diffusionLimitedAggregation") {
         generateGeoGebraDiffusionLimitedAggregation();
+    } else if (objectType === "epidemicBranching") {
+        generateGeoGebraEpidemicBranching();
     } else if (objectType === "geneticDrift") {
         generateGeoGebraGeneticDrift();
     } else if (objectType === "geneticDriftGrid") {
@@ -600,16 +619,13 @@ function generateGeoGebraGaltonWatson() {
     let jitter = document.getElementById("gwJitter").value;
     let maxBranches = document.getElementById("gwMaxBranches").value;
 
-    let instructions =
+let instructions =
 `// Galton-Watson Tree uses GeoGebra Global JavaScript.
 //
-// Paste the JavaScript code from the panel below into GeoGebra Global JavaScript.
+// Paste the JavaScript code from the GeoGebra Global JavaScript panel
+// into GeoGebra's Global JavaScript section.
 //
-// Then create two GeoGebra buttons with these JavaScript commands:
-//
-// setupGWControls();
-//
-// buildGW();
+// Use the GeoGebra Button Setup panel for the required button calls.
 //
 // Recommended use:
 //
@@ -633,6 +649,22 @@ function generateGeoGebraGaltonWatson() {
 // Note:
 // Larger p and larger generation values can create many branches.
 // If GeoGebra slows down, reduce gwGenerations or gwMaxBranches.`;
+
+let buttonInstructions =
+`Create these GeoGebra buttons.
+
+Button label:
+Setup GW controls
+
+On Click JavaScript:
+setupGWControls();
+
+Button label:
+Build GW tree
+
+On Click JavaScript:
+buildGW();
+`;
 
     let code =
 `// GeoGebra Global JavaScript
@@ -956,7 +988,7 @@ function buildGW() {
     setGWNumber("GWCurrentMaxBranches", GW.maxBranches);
 }`;
 
-    setOutputs(instructions, code);
+    setOutputs(instructions, code, "", buttonInstructions);
 }
 
 
@@ -973,13 +1005,10 @@ function generateGeoGebraCellBranching() {
     let instructions =
 `// Biological Cell Branching uses GeoGebra Global JavaScript.
 //
-// Paste the JavaScript code from the panel below into GeoGebra Global JavaScript.
+// Paste the JavaScript code from the GeoGebra Global JavaScript panel
+// into GeoGebra's Global JavaScript section.
 //
-// Then create two GeoGebra buttons with these JavaScript commands:
-//
-// setupCellBranchingControls();
-//
-// buildCellBranching();
+// Use the GeoGebra Button Setup panel for the required button calls.
 //
 // Recommended use:
 //
@@ -1031,6 +1060,7 @@ var CellB = {
     jitter: ${jitter},
     maxBranches: ${maxBranches}
 };
+
 
 function setupCellBranchingControls() {
 
@@ -1450,7 +1480,23 @@ function buildCellBranching() {
     setCellNumber("CellCurrentMaxBranches", CellB.maxBranches);
 }`;
 
-    setOutputs(instructions, code);
+let buttonInstructions =
+`Create these GeoGebra buttons.
+
+Button label:
+Generate cell branching tree
+
+On Click JavaScript:
+buildCellBranching()
+
+Button label:
+Clear tree
+
+On Click JavaScript:
+clearCellBranching();
+`;
+
+    setOutputs(instructions, code, "", buttonInstructions);
 }
 
 function generateGWExtinctionAnalysis() {
@@ -1458,6 +1504,14 @@ function generateGWExtinctionAnalysis() {
     let p = document.getElementById("gwExtP").value;
     let g = document.getElementById("gwExtG").value;
     let trials = document.getElementById("gwTrials").value;
+
+    let instructions =
+`// Galton-Watson Extinction Analysis uses GeoGebra Global JavaScript.
+//
+// Paste the JavaScript code from the GeoGebra Global JavaScript panel
+// into GeoGebra's Global JavaScript section.
+//
+// Use the GeoGebra Button Setup panel for the required button calls.`;
 
     let code =
 `// Galton-Watson Extinction Statistics
@@ -1512,8 +1566,23 @@ function runGWStatistics() {
     ggbApplet.evalCommand("GWExtinctionRate = " + extinctionRate);
     ggbApplet.evalCommand("GWSurvivalRate = " + survivalRate);
 }`;
+    const buttonInstructions =
+`Create these GeoGebra buttons.
 
-    setOutputs(code);
+Button label:
+Run extinction analysis
+
+On Click JavaScript:
+runGWStatistics();
+
+Button label:
+Clear
+
+On Click JavaScript:
+clearGW();
+`;
+
+    setOutputs(instructions, code, "", buttonInstructions);
 }
 
 function generateGeoGebraBernoulli() {
@@ -1545,6 +1614,11 @@ function updateDescription() {
             text =
                 "A torus (doughnut-shaped surface) defined by major radius R and tube radius r.";
             break;
+
+        case "torusDoubleHelix":
+            text =
+        "A decorative mathematical object: a torus whose tube is wrapped by a double helix. It combines the torus surface with two phase-shifted helical curves and connecting rungs.";
+        break;
 
         case "tetrahedron":
             text =
@@ -1602,6 +1676,11 @@ function updateDescription() {
         text = "A fixed-size ancestry model related to branching processes. Each next-generation allele copy randomly samples one source allele copy from the previous generation and inherits its colour. Some source copies leave no descendants, while others leave several, producing genetic drift.";
         break;
 
+        case "epidemicBranching":
+        text =
+        "An epidemic branching-process model. One infected case can infect several contacts, and each possible transmission happens by chance. The model shows how an outbreak may die out quickly or grow across generations.";
+        break;
+
         case "gerono":
             text =
                 "The Lemniscate of Gerono is a figure-8 curve often used as a simple parametric lemniscate.";
@@ -1622,6 +1701,11 @@ function updateDescription() {
                 "A stochastic branching process used to study population growth and extinction.";
             break;
 
+        case "reactionDiffusion":
+        text =
+        "A reaction-diffusion pattern-formation model. Two quantities spread across a grid while reacting locally, producing spots, mazes, stripes, and other organised patterns from a small disturbance.";
+        break;
+
         case "cellBranching":
             text =
         "A biological branching model in which each cell may die, remain quiescent, or proliferate into two daughter cells.";
@@ -1630,6 +1714,11 @@ function updateDescription() {
         case "cellBranchingStats":
             text =
         "Runs many Biological Cell Branching trials and estimates extinction, survival, and final population statistics.";
+        break;
+
+        case "cellBranchingCombined":
+        text =
+        "A combined biological branching-process demonstration. It builds a visible cell-branching tree and also runs repeated-trial statistics, allowing the visual tree and extinction/growth behaviour to be compared in one model.";
         break;
 
         case "gwExtinction":
@@ -1739,8 +1828,8 @@ function updateDescription() {
         break;
 
         case "birthDeathProcess":
-            text =
-        "A continuous-time branching process in which each individual gives birth or dies after exponentially distributed waiting times.";
+        text =
+        "A continuous-time birth-death branching process. The population changes through random birth and death events, producing a step-like sample path over time.";
         break;
 
         case "birthDeathStats":
@@ -1749,8 +1838,8 @@ function updateDescription() {
         break;
 
         case "birthDeathSamplePaths":
-            text =
-        "Draws several simulated continuous-time birth-death population paths on the same axes to show variation between runs.";
+        text =
+        "Several continuous-time birth-death sample paths plotted together. Each path shows one possible random population history under the same birth and death rates.";
         break;
 
         case "reactionDiffusion":
@@ -1846,6 +1935,13 @@ function updatePreviews() {
                 "<p>Blender preview not yet available for this object.</p>";
         break;
 
+        case "torusDoubleHelix":
+            geoGebraPreview =
+                '<img src="media/torusDoubleHelix_geogebra.png" alt="GeoGebra torus with double helix preview">';
+            blenderPreview =
+                '<img src="media/torusDoubleHelix_blender.png" alt="Blender torus with double helix preview">';
+        break;
+
         case "tetrahedron":
             geoGebraPreview =
                 '<img src="media/tetrahedron.png" alt="GeoGebra tetrahedron preview">';
@@ -1906,7 +2002,7 @@ function updatePreviews() {
             geoGebraPreview =
                 '<img src="media/doubleHelixBasePairs.png" alt="GeoGebra DNA double helix with base pairs preview">';
             blenderPreview =
-                "<p>Blender preview not yet available for this object.</p>";
+                '<img src="media/doubleHelixBasePairs_blender.png" alt="Blender DNA double helix with base pairs preview">';
             break;
 
             case "dnaDoubleHelixSNP":
@@ -2117,6 +2213,13 @@ function updatePreviews() {
                 "<p>Blender preview not yet available for this object.</p>";
             break;
 
+        case "epidemicBranching":
+            geoGebraPreview =
+            "<p>GeoGebra preview not yet available for Epidemic Branching Process.</p>";
+            blenderPreview =
+            "<p>Blender preview not yet available for this object.</p>";
+        break;
+
         default:
             geoGebraPreview = "<p>GeoGebra preview not yet available for this object.</p>";
             blenderPreview = "<p>Blender preview not yet available for this object.</p>";
@@ -2165,6 +2268,11 @@ function updateFormula() {
             formula =
             "x=(R+r cos(v)) cos(u), y=(R+r cos(v)) sin(u), z=r sin(v)";
             break;
+
+        case "torusDoubleHelix":
+            formula =
+        "Torus surface: x = (R + r cos(v)) cos(u), y = (R + r cos(v)) sin(u), z = r sin(v). The double helix is formed by setting u = t and v = k t, with the second strand phase-shifted around the tube.";
+        break;
 
         case "tetrahedron":
             formula =
@@ -2226,6 +2334,11 @@ function updateFormula() {
             formula = "Each offspring allele copy chooses one source allele copy at random from the previous generation. Descendant counts are random but constrained to sum to the fixed population size.";
         break;
 
+        case "epidemicBranching":
+            formula =
+        "Each infected individual has c possible contacts. Each contact is infected with probability p. The expected number of new infections is R = c p. If R is below 1, outbreaks usually die out; if R is above 1, outbreaks may grow.";
+        break;
+
         case "booth":
             formula = "x = a sin(t)/(1 + cos²(t)), y = a sin(t) cos(t)/(1 + cos²(t))";
             break;
@@ -2258,6 +2371,11 @@ function updateFormula() {
             formula = "Mean offspring m = 2p";
             break;
 
+        case "reactionDiffusion":
+        formula =
+        "Two fields, U and V, diffuse across a grid and react locally. U acts like a background food supply, while V acts like a pattern-forming chemical. Their interaction can amplify small local disturbances into visible spatial patterns.";
+        break;
+
         case "cellBranching":
             formula = "p0 + p1 + p2 = 1, mean offspring m = p1 + 2p2";
         break;
@@ -2265,6 +2383,11 @@ function updateFormula() {
         case "cellBranchingStats":
             formula =
                 "p1 = 1 − p0 − p2, mean offspring m = p1 + 2p2";
+        break;
+
+        case "cellBranchingCombined":
+        formula =
+        "Each cell has three possible outcomes: death with probability p0, one-child continuation with probability p1, or two-child proliferation with probability p2, where p1 = 1 - p0 - p2. The same probabilities drive both the visible tree and the repeated-trial statistics.";
         break;
 
         case "gwExtinction":
@@ -2352,8 +2475,8 @@ function updateFormula() {
         break;
 
         case "birthDeathProcess":
-            formula =
-                "event rate = N(λ + μ), birth probability = λ/(λ + μ)";
+        formula =
+        "Each individual gives birth at rate λ and dies at rate μ. The total event rate is proportional to the current population size, with births increasing the population by 1 and deaths decreasing it by 1.";
         break;
 
         case "birthDeathStats":
@@ -2362,8 +2485,8 @@ function updateFormula() {
         break;
 
         case "birthDeathSamplePaths":
-            formula =
-                "Each path uses event rate N(λ + μ) and birth probability λ/(λ + μ).";
+        formula =
+        "Each path follows the same birth-death rules: births occur at rate λN and deaths at rate μN. Multiple paths show the spread of possible outcomes from repeated stochastic runs.";
         break;
 
         case "reactionDiffusion":
@@ -2424,6 +2547,415 @@ function generateGeoGebraAnimatedLissajous() {
 ${name} = Curve(${A} sin(${a} t + phase), ${B} sin(${b} t), t, 0, 2*pi)`;
 
     setOutputs(code);
+}
+
+function generateGeoGebraTorusDoubleHelix() {
+
+    const R = Number(document.getElementById("tdhMajorRadius").value);
+    const r = Number(document.getElementById("tdhTubeRadius").value);
+    const windings = Number(document.getElementById("tdhWindings").value);
+    const strandOffset = Number(document.getElementById("tdhStrandOffset").value);
+    const rungCount = Number(document.getElementById("tdhRungCount").value);
+    const lift = Number(document.getElementById("tdhLift").value);
+
+    let commands =
+`// Torus with Double Helix
+//
+// No long manual GeoGebra Input paste is needed for this object.
+//
+// Paste the GeoGebra Global JavaScript into GeoGebra.
+// Then use the GeoGebra Button Setup panel to create the buttons.
+//
+// Press the Build torus double helix button to construct:
+//
+// 1. the torus surface
+// 2. the two helical strands
+// 3. the connecting rungs
+//
+// Optional direct call:
+//
+// buildTorusDoubleHelix();
+`;
+
+    let code =
+`// GeoGebra Global JavaScript
+// Torus with Double Helix
+
+function tdhNumber(x) {
+    return Number(x).toFixed(4);
+}
+
+function buildTorusDoubleHelix() {
+
+    clearTorusDoubleHelix();
+
+    var R = ${R};
+    var r = ${r};
+    var windings = ${windings};
+    var strandOffset = ${strandOffset};
+    var rungCount = ${rungCount};
+    var lift = ${lift};
+
+    var helixRadius = r + lift;
+
+    ggbApplet.evalCommand(
+        "TorusSurface = Surface(" +
+        "(" + R + " + " + r + " cos(v)) cos(u), " +
+        "(" + R + " + " + r + " cos(v)) sin(u), " +
+        r + " sin(v), " +
+        "u, 0, 2*pi, v, 0, 2*pi)"
+    );
+
+    ggbApplet.evalCommand(
+        "TDH1 = Curve(" +
+        "(" + R + " + " + helixRadius + " cos(" + windings + " t)) cos(t), " +
+        "(" + R + " + " + helixRadius + " cos(" + windings + " t)) sin(t), " +
+        helixRadius + " sin(" + windings + " t), " +
+        "t, 0, 2*pi)"
+    );
+
+    ggbApplet.evalCommand(
+        "TDH2 = Curve(" +
+        "(" + R + " + " + helixRadius + " cos(" + windings + " t + " + strandOffset + ")) cos(t), " +
+        "(" + R + " + " + helixRadius + " cos(" + windings + " t + " + strandOffset + ")) sin(t), " +
+        helixRadius + " sin(" + windings + " t + " + strandOffset + "), " +
+        "t, 0, 2*pi)"
+    );
+
+    for (var i = 0; i < rungCount; i++) {
+
+        var t = i * 2 * Math.PI / rungCount;
+
+        var v1 = windings * t;
+        var v2 = windings * t + strandOffset;
+
+        var x1 = (R + helixRadius * Math.cos(v1)) * Math.cos(t);
+        var y1 = (R + helixRadius * Math.cos(v1)) * Math.sin(t);
+        var z1 = helixRadius * Math.sin(v1);
+
+        var x2 = (R + helixRadius * Math.cos(v2)) * Math.cos(t);
+        var y2 = (R + helixRadius * Math.cos(v2)) * Math.sin(t);
+        var z2 = helixRadius * Math.sin(v2);
+
+        ggbApplet.evalCommand(
+            "TDH_P1_" + i + " = (" +
+            tdhNumber(x1) + ", " +
+            tdhNumber(y1) + ", " +
+            tdhNumber(z1) + ")"
+        );
+
+        ggbApplet.evalCommand(
+            "TDH_P2_" + i + " = (" +
+            tdhNumber(x2) + ", " +
+            tdhNumber(y2) + ", " +
+            tdhNumber(z2) + ")"
+        );
+
+        ggbApplet.evalCommand(
+            "TDH_Rung_" + i + " = Segment(TDH_P1_" + i + ", TDH_P2_" + i + ")"
+        );
+    }
+
+    styleTorusDoubleHelix();
+}
+
+function styleTorusDoubleHelix() {
+
+    try {
+    ggbApplet.setColor("TorusSurface", 215, 215, 215);
+    ggbApplet.setFilling("TorusSurface", 0.22);
+    ggbApplet.setLineThickness("TorusSurface", 0);
+    ggbApplet.setLabelVisible("TorusSurface", false);
+    } catch(e) {}
+
+    try {
+        ggbApplet.setColor("TDH1", 60, 130, 255);
+        ggbApplet.setColor("TDH2", 220, 90, 220);
+        ggbApplet.setLineThickness("TDH1", 5);
+        ggbApplet.setLineThickness("TDH2", 5);
+        ggbApplet.setLabelVisible("TDH1", false);
+        ggbApplet.setLabelVisible("TDH2", false);
+    } catch(e) {}
+
+    for (var i = 0; i < ${rungCount}; i++) {
+        try {
+            ggbApplet.setColor("TDH_Rung_" + i, 230, 230, 230);
+            ggbApplet.setLineThickness("TDH_Rung_" + i, 2);
+            ggbApplet.setLabelVisible("TDH_Rung_" + i, false);
+
+            ggbApplet.setVisible("TDH_P1_" + i, false);
+            ggbApplet.setVisible("TDH_P2_" + i, false);
+            ggbApplet.setLabelVisible("TDH_P1_" + i, false);
+            ggbApplet.setLabelVisible("TDH_P2_" + i, false);
+        } catch(e) {}
+    }
+}
+
+function hideTorusSurface() {
+    try {
+        ggbApplet.setVisible("TorusSurface", false);
+    } catch(e) {}
+}
+
+function showTorusSurface() {
+    try {
+        ggbApplet.setVisible("TorusSurface", true);
+        styleTorusDoubleHelix();
+    } catch(e) {}
+}
+
+function clearTorusDoubleHelix() {
+
+    for (var i = ggbApplet.getObjectNumber() - 1; i >= 0; i--) {
+        try {
+            var obj = ggbApplet.getObjectName(i);
+
+            if (
+                obj === "TorusSurface" ||
+                obj === "TDH1" ||
+                obj === "TDH2" ||
+                obj.indexOf("TDH_P1_") === 0 ||
+                obj.indexOf("TDH_P2_") === 0 ||
+                obj.indexOf("TDH_Rung_") === 0
+            ) {
+                ggbApplet.deleteObject(obj);
+            }
+        } catch(e) {}
+    }
+}
+`;
+
+    let blenderCode =
+`import bpy
+import math
+from mathutils import Vector
+
+# ------------------------------------------------------------
+# Blender Torus with Double Helix
+# Generated by the Visual Mathematics Framework
+# ------------------------------------------------------------
+
+bpy.ops.object.select_all(action='SELECT')
+bpy.ops.object.delete(use_global=False)
+
+R = ${R}
+r = ${r}
+WINDINGS = ${windings}
+STRAND_OFFSET = ${strandOffset}
+RUNG_COUNT = ${rungCount}
+LIFT = ${lift}
+
+HELIX_RADIUS = r + LIFT
+SAMPLES = 360
+
+def make_material(name, color, roughness=0.35, alpha=1.0):
+    mat = bpy.data.materials.new(name=name)
+    mat.use_nodes = True
+
+    bsdf = mat.node_tree.nodes.get("Principled BSDF")
+
+    if bsdf:
+        bsdf.inputs["Base Color"].default_value = color
+        bsdf.inputs["Alpha"].default_value = alpha
+        bsdf.inputs["Roughness"].default_value = roughness
+
+    if alpha < 1.0:
+        mat.blend_method = 'BLEND'
+
+    return mat
+
+mat_torus = make_material("Translucent icy blue torus", (0.55, 0.82, 1.0, 0.34), roughness=0.28, alpha=0.34)
+mat_strand_1 = make_material("Blue helix strand", (0.15, 0.48, 1.0, 1.0), roughness=0.22)
+mat_strand_2 = make_material("Magenta helix strand", (0.95, 0.28, 0.95, 1.0), roughness=0.22)
+mat_rung = make_material("White rungs", (0.92, 0.92, 0.95, 1.0), roughness=0.25)
+
+bpy.ops.mesh.primitive_torus_add(
+    major_radius=R,
+    minor_radius=r,
+    major_segments=160,
+    minor_segments=36,
+    location=(0, 0, 0)
+)
+
+torus = bpy.context.object
+torus.name = "Torus surface"
+torus.data.materials.append(mat_torus)
+
+def torus_helix_point(t, offset):
+    v = WINDINGS * t + offset
+    x = (R + HELIX_RADIUS * math.cos(v)) * math.cos(t)
+    y = (R + HELIX_RADIUS * math.cos(v)) * math.sin(t)
+    z = HELIX_RADIUS * math.sin(v)
+    return Vector((x, y, z))
+
+def create_curve(name, points, material, bevel_depth):
+    curve = bpy.data.curves.new(name=name, type='CURVE')
+    curve.dimensions = '3D'
+    curve.resolution_u = 3
+    curve.bevel_depth = bevel_depth
+    curve.bevel_resolution = 5
+
+    spline = curve.splines.new('POLY')
+    spline.points.add(len(points) - 1)
+
+    for p, co in zip(spline.points, points):
+        p.co = (co.x, co.y, co.z, 1.0)
+
+    obj = bpy.data.objects.new(name, curve)
+    bpy.context.collection.objects.link(obj)
+    obj.data.materials.append(material)
+
+    return obj
+
+points1 = []
+points2 = []
+
+for i in range(SAMPLES + 1):
+    t = 2 * math.pi * i / SAMPLES
+    points1.append(torus_helix_point(t, 0.0))
+    points2.append(torus_helix_point(t, STRAND_OFFSET))
+
+strand1 = create_curve("Torus double helix strand 1", points1, mat_strand_1, 0.045)
+strand2 = create_curve("Torus double helix strand 2", points2, mat_strand_2, 0.045)
+
+def create_cylinder_between(name, p1, p2, radius, material):
+    mid = (p1 + p2) / 2
+    direction = p2 - p1
+    length = direction.length
+
+    bpy.ops.mesh.primitive_cylinder_add(
+        vertices=16,
+        radius=radius,
+        depth=length,
+        location=mid
+    )
+
+    obj = bpy.context.object
+    obj.name = name
+    obj.rotation_mode = 'QUATERNION'
+    obj.rotation_quaternion = direction.to_track_quat('Z', 'Y')
+    obj.data.materials.append(material)
+
+    return obj
+
+for i in range(RUNG_COUNT):
+    t = 2 * math.pi * i / RUNG_COUNT
+    p1 = torus_helix_point(t, 0.0)
+    p2 = torus_helix_point(t, STRAND_OFFSET)
+    create_cylinder_between("Torus helix rung " + str(i), p1, p2, 0.018, mat_rung)
+
+# Lighting
+bpy.ops.object.light_add(type='AREA', location=(0, -6, 7))
+light = bpy.context.object
+light.name = "Large softbox"
+light.data.energy = 500
+light.data.size = 6
+
+bpy.ops.object.light_add(type='POINT', location=(-4, 4, 4))
+rim = bpy.context.object
+rim.name = "Small rim light"
+rim.data.energy = 110
+
+# Camera
+bpy.ops.object.camera_add(
+    location=(6.5, -8.5, 5.2),
+    rotation=(math.radians(60), 0, math.radians(38))
+)
+
+camera = bpy.context.object
+bpy.context.scene.camera = camera
+camera.data.lens = 32
+
+bpy.context.scene.render.resolution_x = 1200
+bpy.context.scene.render.resolution_y = 900
+
+world = bpy.context.scene.world
+if world:
+    world.color = (0.82, 0.84, 0.88)
+
+# Slow rotation animation
+animated_objects = [
+    torus,
+    strand1,
+    strand2
+]
+
+for obj in bpy.context.scene.objects:
+    if obj.name.startswith("Torus helix rung "):
+        animated_objects.append(obj)
+
+empty = bpy.data.objects.new("Torus double helix rotation control", None)
+bpy.context.collection.objects.link(empty)
+
+for obj in animated_objects:
+    obj.parent = empty
+
+bpy.context.scene.frame_start = 1
+bpy.context.scene.frame_end = 180
+
+empty.rotation_euler = (0, 0, 0)
+empty.keyframe_insert(data_path="rotation_euler", frame=1)
+
+empty.rotation_euler = (0, 0, math.radians(360))
+empty.keyframe_insert(data_path="rotation_euler", frame=180)
+
+# Make the rotation steady rather than ease-in/ease-out
+try:
+    action = empty.animation_data.action
+
+    for fcurve in action.fcurves:
+        for keyframe in fcurve.keyframe_points:
+            keyframe.interpolation = 'LINEAR'
+
+except Exception:
+    pass
+
+for obj in bpy.context.scene.objects:
+    if obj.type == 'MESH':
+        bpy.context.view_layer.objects.active = obj
+        obj.select_set(True)
+        try:
+            bpy.ops.object.shade_smooth()
+        except Exception:
+            pass
+        obj.select_set(False)
+`;
+
+    let buttonInstructions =
+`Create these GeoGebra buttons.
+
+Button label:
+Build torus double helix
+
+On Click JavaScript:
+buildTorusDoubleHelix();
+
+Button label:
+Style torus double helix
+
+On Click JavaScript:
+styleTorusDoubleHelix();
+
+Button label:
+Hide torus surface
+
+On Click JavaScript:
+hideTorusSurface();
+
+Button label:
+Show torus surface
+
+On Click JavaScript:
+showTorusSurface();
+
+Button label:
+Clear torus double helix
+
+On Click JavaScript:
+clearTorusDoubleHelix();
+`;
+
+    setOutputs(commands, code, blenderCode, buttonInstructions);
 }
 
 function generateGeoGebraTorusSurface() {
@@ -2694,19 +3226,10 @@ function generateGeoGebraCube() {
     let instructions =
 `// Cube construction uses the general GeoGebra mesh engine.
 //
-// Paste the JavaScript code from the panel below into GeoGebra Global JavaScript.
+// Paste the JavaScript code from the GeoGebra Global JavaScript panel
+// into GeoGebra's Global JavaScript section.
 //
-// Then create GeoGebra buttons with these JavaScript commands:
-//
-// buildCube();
-// styleCube();
-// hideStaticCube();
-// showStaticCube();
-// hideRotatingCube();
-// showRotatingCube();
-// startCubeRotation();
-// stopCubeRotation();
-// resetCubeRotation();
+// Use the GeoGebra Button Setup panel for the required button calls.
 //
 // Recommended first test:
 //
@@ -2770,7 +3293,65 @@ function generateGeoGebraCube() {
         80, 170, 255
     );
 
-    setOutputs(instructions, jsCode);
+    let buttonInstructions =
+`Create these GeoGebra buttons.
+
+Button label:
+Build cube
+
+On Click JavaScript:
+buildCube();
+
+Button label:
+Style cube
+
+On Click JavaScript:
+styleCube();
+
+Button label:
+Hide static cube
+
+On Click JavaScript:
+hideStaticCube();
+
+Button label:
+Show static cube
+
+On Click JavaScript:
+showStaticCube();
+
+Button label:
+Hide rotating cube
+
+On Click JavaScript:
+hideRotatingCube();
+
+Button label:
+Show rotating cube
+
+On Click JavaScript:
+showRotatingCube();
+
+Button label:
+Start cube rotation
+
+On Click JavaScript:
+startCubeRotation();
+
+Button label:
+Stop cube rotation
+
+On Click JavaScript:
+stopCubeRotation();
+
+Button label:
+Reset cube rotation
+
+On Click JavaScript:
+resetCubeRotation();
+`;
+
+    setOutputs(instructions, jsCode, "", buttonInstructions);
 }
 
 function generateGeoGebraTetrahedron() {
@@ -2781,19 +3362,10 @@ function generateGeoGebraTetrahedron() {
     let instructions =
 `// Tetrahedron construction uses the general GeoGebra mesh engine.
 //
-// Paste the JavaScript code from the panel below into GeoGebra Global JavaScript.
+// Paste the JavaScript code from the GeoGebra Global JavaScript panel
+// into GeoGebra's Global JavaScript section.
 //
-// Then create GeoGebra buttons with these JavaScript commands:
-//
-// buildTetrahedron();
-// styleTetrahedron();
-// hideStaticTetrahedron();
-// showStaticTetrahedron();
-// hideRotatingTetrahedron();
-// showRotatingTetrahedron();
-// startTetrahedronRotation();
-// stopTetrahedronRotation();
-// resetTetrahedronRotation();
+// Use the GeoGebra Button Setup panel for the required button calls.
 //
 // Recommended first test:
 //
@@ -2850,7 +3422,65 @@ function generateGeoGebraTetrahedron() {
         80, 140, 255
     );
 
-    setOutputs(instructions, jsCode);
+    let buttonInstructions =
+`Create these GeoGebra buttons.
+
+Button label:
+Build tetrahedron
+
+On Click JavaScript:
+buildTetrahedron();
+
+Button label:
+Style tetrahedron
+
+On Click JavaScript:
+styleTetrahedron();
+
+Button label:
+Hide static tetrahedron
+
+On Click JavaScript:
+hideStaticTetrahedron();
+
+Button label:
+Show static tetrahedron
+
+On Click JavaScript:
+showStaticTetrahedron();
+
+Button label:
+Hide rotating tetrahedron
+
+On Click JavaScript:
+hideRotatingTetrahedron();
+
+Button label:
+Show rotating tetrahedron
+
+On Click JavaScript:
+showRotatingTetrahedron();
+
+Button label:
+Start tetrahedron rotation
+
+On Click JavaScript:
+startTetrahedronRotation();
+
+Button label:
+Stop tetrahedron rotation
+
+On Click JavaScript:
+stopTetrahedronRotation();
+
+Button label:
+Reset tetrahedron rotation
+
+On Click JavaScript:
+resetTetrahedronRotation();
+`;
+
+    setOutputs(instructions, jsCode, "", buttonInstructions);
 }
 
 function generateGeoGebraOctahedron() {
@@ -2861,19 +3491,10 @@ function generateGeoGebraOctahedron() {
     let instructions =
 `// Octahedron construction uses the general GeoGebra mesh engine.
 //
-// Paste the JavaScript code from the panel below into GeoGebra Global JavaScript.
+// Paste the JavaScript code from the GeoGebra Global JavaScript panel
+// into GeoGebra's Global JavaScript section.
 //
-// Then create GeoGebra buttons with these JavaScript commands:
-//
-// buildOctahedron();
-// styleOctahedron();
-// hideStaticOctahedron();
-// showStaticOctahedron();
-// hideRotatingOctahedron();
-// showRotatingOctahedron();
-// startOctahedronRotation();
-// stopOctahedronRotation();
-// resetOctahedronRotation();
+// Use the GeoGebra Button Setup panel for the required button calls.
 //
 // Recommended first test:
 //
@@ -2881,10 +3502,6 @@ function generateGeoGebraOctahedron() {
 // 2. Run styleOctahedron();
 // 3. Run hideStaticOctahedron();
 // 4. Run startOctahedronRotation();
-//
-// The octahedron is stored as:
-//
-// vertices + faces
 //
 // The angle variable 'ang' is created automatically by buildOctahedron().
 // If GeoGebra does not show it as a slider, make 'ang' visible manually
@@ -2937,7 +3554,65 @@ function generateGeoGebraOctahedron() {
         120, 200, 255
     );
 
-    setOutputs(instructions, jsCode);
+    let buttonInstructions =
+`Create these GeoGebra buttons.
+
+Button label:
+Build octahedron
+
+On Click JavaScript:
+buildOctahedron();
+
+Button label:
+Style octahedron
+
+On Click JavaScript:
+styleOctahedron();
+
+Button label:
+Hide static octahedron
+
+On Click JavaScript:
+hideStaticOctahedron();
+
+Button label:
+Show static octahedron
+
+On Click JavaScript:
+showStaticOctahedron();
+
+Button label:
+Hide rotating octahedron
+
+On Click JavaScript:
+hideRotatingOctahedron();
+
+Button label:
+Show rotating octahedron
+
+On Click JavaScript:
+showRotatingOctahedron();
+
+Button label:
+Start octahedron rotation
+
+On Click JavaScript:
+startOctahedronRotation();
+
+Button label:
+Stop octahedron rotation
+
+On Click JavaScript:
+stopOctahedronRotation();
+
+Button label:
+Reset octahedron rotation
+
+On Click JavaScript:
+resetOctahedronRotation();
+`;
+
+    setOutputs(instructions, jsCode, "", buttonInstructions);
 }
 
 function generateGeoGebraIcosahedron() {
@@ -2948,19 +3623,10 @@ function generateGeoGebraIcosahedron() {
     let instructions =
 `// Icosahedron construction uses the general GeoGebra mesh engine.
 //
-// Paste the JavaScript code from the panel below into GeoGebra Global JavaScript.
+// Paste the JavaScript code from the GeoGebra Global JavaScript panel
+// into GeoGebra's Global JavaScript section.
 //
-// Then create GeoGebra buttons with these JavaScript commands:
-//
-// buildIcosahedron();
-// styleIcosahedron();
-// hideStaticIcosahedron();
-// showStaticIcosahedron();
-// hideRotatingIcosahedron();
-// showRotatingIcosahedron();
-// startIcosahedronRotation();
-// stopIcosahedronRotation();
-// resetIcosahedronRotation();
+// Use the GeoGebra Button Setup panel for the required button calls.
 //
 // Recommended first test:
 //
@@ -2968,10 +3634,6 @@ function generateGeoGebraIcosahedron() {
 // 2. Run styleIcosahedron();
 // 3. Run hideStaticIcosahedron();
 // 4. Run startIcosahedronRotation();
-//
-// The icosahedron is stored as:
-//
-// vertices + faces
 //
 // The angle variable 'ang' is created automatically by buildIcosahedron().
 // If GeoGebra does not show it as a slider, make 'ang' visible manually
@@ -3049,7 +3711,65 @@ function generateGeoGebraIcosahedron() {
         120, 120, 255
     );
 
-    setOutputs(instructions, jsCode);
+    let buttonInstructions =
+`Create these GeoGebra buttons.
+
+Button label:
+Build icosahedron
+
+On Click JavaScript:
+buildIcosahedron();
+
+Button label:
+Style icosahedron
+
+On Click JavaScript:
+styleIcosahedron();
+
+Button label:
+Hide static icosahedron
+
+On Click JavaScript:
+hideStaticIcosahedron();
+
+Button label:
+Show static icosahedron
+
+On Click JavaScript:
+showStaticIcosahedron();
+
+Button label:
+Hide rotating icosahedron
+
+On Click JavaScript:
+hideRotatingIcosahedron();
+
+Button label:
+Show rotating icosahedron
+
+On Click JavaScript:
+showRotatingIcosahedron();
+
+Button label:
+Start icosahedron rotation
+
+On Click JavaScript:
+startIcosahedronRotation();
+
+Button label:
+Stop icosahedron rotation
+
+On Click JavaScript:
+stopIcosahedronRotation();
+
+Button label:
+Reset icosahedron rotation
+
+On Click JavaScript:
+resetIcosahedronRotation();
+`;
+
+    setOutputs(instructions, jsCode, "", buttonInstructions);
 }
 
 function generateGeoGebraDodecahedron() {
@@ -3060,19 +3780,10 @@ function generateGeoGebraDodecahedron() {
     let instructions =
 `// Dodecahedron construction uses the general GeoGebra mesh engine.
 //
-// Paste the JavaScript code from the panel below into GeoGebra Global JavaScript.
+// Paste the JavaScript code from the GeoGebra Global JavaScript panel
+// into GeoGebra's Global JavaScript section.
 //
-// Then create GeoGebra buttons with these JavaScript commands:
-//
-// buildDodecahedron();
-// styleDodecahedron();
-// hideStaticDodecahedron();
-// showStaticDodecahedron();
-// hideRotatingDodecahedron();
-// showRotatingDodecahedron();
-// startDodecahedronRotation();
-// stopDodecahedronRotation();
-// resetDodecahedronRotation();
+// Use the GeoGebra Button Setup panel for the required button calls.
 //
 // Recommended first test:
 //
@@ -3080,10 +3791,6 @@ function generateGeoGebraDodecahedron() {
 // 2. Run styleDodecahedron();
 // 3. Run hideStaticDodecahedron();
 // 4. Run startDodecahedronRotation();
-//
-// The dodecahedron is stored as:
-//
-// vertices + faces
 //
 // The angle variable 'ang' is created automatically by buildDodecahedron().
 // If GeoGebra does not show it as a slider, make 'ang' visible manually
@@ -3158,7 +3865,65 @@ function generateGeoGebraDodecahedron() {
         180, 120, 255
     );
 
-    setOutputs(instructions, jsCode);
+    let buttonInstructions =
+`Create these GeoGebra buttons.
+
+Button label:
+Build dodecahedron
+
+On Click JavaScript:
+buildDodecahedron();
+
+Button label:
+Style dodecahedron
+
+On Click JavaScript:
+styleDodecahedron();
+
+Button label:
+Hide static dodecahedron
+
+On Click JavaScript:
+hideStaticDodecahedron();
+
+Button label:
+Show static dodecahedron
+
+On Click JavaScript:
+showStaticDodecahedron();
+
+Button label:
+Hide rotating dodecahedron
+
+On Click JavaScript:
+hideRotatingDodecahedron();
+
+Button label:
+Show rotating dodecahedron
+
+On Click JavaScript:
+showRotatingDodecahedron();
+
+Button label:
+Start dodecahedron rotation
+
+On Click JavaScript:
+startDodecahedronRotation();
+
+Button label:
+Stop dodecahedron rotation
+
+On Click JavaScript:
+stopDodecahedronRotation();
+
+Button label:
+Reset dodecahedron rotation
+
+On Click JavaScript:
+resetDodecahedronRotation();
+`;
+
+    setOutputs(instructions, jsCode, "", buttonInstructions);
 }
 
 function generateGeoGebraMobiusStrip() {
@@ -3248,46 +4013,20 @@ function generateGeoGebraReflect() {
 function generateGeoGebraFibonacciSpiral() {
 
     let instructions =
-`Fibonacci Spiral with Coloured Squares
-
-This version builds a Fibonacci square tiling together with the
-quarter-circle spiral arcs.
-
-It is designed to give a better Demonstration Preview and a clearer
-YouTube presentation, because the viewer can see both:
-
-1. the Fibonacci squares, and
-2. the spiral drawn through them.
-
-Create two GeoGebra buttons with JavaScript:
-
-buildFibonacciSpiralWithSquares();
-
-clearFibonacciSpiral();
-
-Suggested button labels:
-
-Build Fibonacci Spiral
-Clear Fibonacci Spiral
-
-Current default settings inside the Global JavaScript:
-
-squareCount = 7
-unit = 0.35
-
-You can change these later inside the generated Global JavaScript.
-
-Visual styling:
-
-- coloured square fills
-- darker spiral arcs
-- labels hidden
-- generated points hidden`;
-
-    let commands =
-`// Fibonacci Spiral with Coloured Squares
-// No GeoGebra Input Commands are required.
-// Paste the Global JavaScript into GeoGebra Global JavaScript.`;
+`// Fibonacci Spiral uses GeoGebra Global JavaScript.
+//
+// Paste the JavaScript code from the GeoGebra Global JavaScript panel
+// into GeoGebra's Global JavaScript section.
+//
+// Use the GeoGebra Button Setup panel for the required button calls.
+//
+// Recommended use:
+//
+// 1. Run setupFibonacciControls();
+// 2. Show the created values as sliders if needed.
+// 3. Run buildFibonacciSpiral();
+// 4. Change the sliders.
+// 5. Run buildFibonacciSpiral() again.`;
 
     let code =
 `// GeoGebra Global JavaScript
@@ -3585,8 +4324,23 @@ for (var k = 0; k < squares.length; k++) {
     // Optional title removed for clean preview capture.
 }`;
 
-    document.getElementById("descriptionBox").innerHTML = instructions;
-    setOutputs(commands, code);
+    let buttonInstructions =
+`Create these GeoGebra buttons.
+
+Button label:
+Setup Fibonacci controls
+
+On Click JavaScript:
+setupFibonacciControls();
+
+Button label:
+Build Fibonacci spiral
+
+On Click JavaScript:
+buildFibonacciSpiral();
+`;
+
+    setOutputs(instructions, code, "", buttonInstructions);
 }
 
 
@@ -3897,13 +4651,10 @@ function generateGeoGebraHilbertCurve() {
     let instructions =
 `// Hilbert Curve uses GeoGebra Global JavaScript.
 //
-// Paste the JavaScript code from the panel below into GeoGebra Global JavaScript.
+// Paste the JavaScript code from the GeoGebra Global JavaScript panel
+// into GeoGebra's Global JavaScript section.
 //
-// Then create two GeoGebra buttons with these JavaScript commands:
-//
-// setupHilbertControls();
-//
-// buildHilbert();
+// Use the GeoGebra Button Setup panel for the required button calls.
 //
 // Recommended use:
 //
@@ -4096,7 +4847,23 @@ function buildHilbert() {
     }
 }`;
 
-    setOutputs(instructions, jsCode);
+    let buttonInstructions =
+`Create these GeoGebra buttons.
+
+Button label:
+Setup Hilbert controls
+
+On Click JavaScript:
+setupHilbertControls();
+
+Button label:
+Build Hilbert curve
+
+On Click JavaScript:
+buildHilbert();
+`;
+
+    setOutputs(instructions, jsCode, "", buttonInstructions);
 }
 
 function generateGeoGebraKochCurve() {
@@ -4108,13 +4875,10 @@ function generateGeoGebraKochCurve() {
     let instructions =
 `// Koch Curve uses GeoGebra Global JavaScript.
 //
-// Paste the JavaScript code from the panel below into GeoGebra Global JavaScript.
+// Paste the JavaScript code from the GeoGebra Global JavaScript panel
+// into GeoGebra's Global JavaScript section.
 //
-// Then create two GeoGebra buttons with these JavaScript commands:
-//
-// setupKochCurveControls();
-//
-// buildKochCurve();
+// Use the GeoGebra Button Setup panel for the required button calls.
 //
 // Recommended use:
 //
@@ -4288,7 +5052,23 @@ function buildKochCurve() {
     }
 }`;
 
-    setOutputs(instructions, jsCode);
+    let buttonInstructions =
+`Create these GeoGebra buttons.
+
+Button label:
+Setup Koch curve controls
+
+On Click JavaScript:
+setupKochCurveControls();
+
+Button label:
+Build Koch curve
+
+On Click JavaScript:
+buildKochCurve();
+`;
+
+    setOutputs(instructions, jsCode, "", buttonInstructions);
 }
 
 function generateGeoGebraKochSnowflake() {
@@ -4300,13 +5080,10 @@ function generateGeoGebraKochSnowflake() {
     let instructions =
 `// Koch Snowflake uses GeoGebra Global JavaScript.
 //
-// Paste the JavaScript code from the panel below into GeoGebra Global JavaScript.
+// Paste the JavaScript code from the GeoGebra Global JavaScript panel
+// into GeoGebra's Global JavaScript section.
 //
-// Then create two GeoGebra buttons with these JavaScript commands:
-//
-// setupKochControls();
-//
-// buildKochSnowflake();
+// Use the GeoGebra Button Setup panel for the required button calls.
 //
 // Recommended use:
 //
@@ -4486,7 +5263,23 @@ function buildKochSnowflake() {
     }
 }`;
 
-    setOutputs(instructions, jsCode);
+    let buttonInstructions =
+`Create these GeoGebra buttons.
+
+Button label:
+Setup Koch snowflake controls
+
+On Click JavaScript:
+setupKochControls();
+
+Button label:
+Build Koch snowflake
+
+On Click JavaScript:
+buildKochSnowflake();
+`;
+
+    setOutputs(instructions, jsCode, "", buttonInstructions);
 }
 
 function generateGeoGebraSierpinskiTriangle() {
@@ -4498,13 +5291,10 @@ function generateGeoGebraSierpinskiTriangle() {
     let instructions =
 `// Sierpinski Triangle uses GeoGebra Global JavaScript.
 //
-// Paste the JavaScript code from the panel below into GeoGebra Global JavaScript.
+// Paste the JavaScript code from the GeoGebra Global JavaScript panel
+// into GeoGebra's Global JavaScript section.
 //
-// Then create two GeoGebra buttons with these JavaScript commands:
-//
-// setupSierpinskiControls();
-//
-// buildSierpinski();
+// Use the GeoGebra Button Setup panel for the required button calls.
 //
 // Recommended use:
 //
@@ -4637,7 +5427,24 @@ function buildSierpinski() {
 
     sierpinski(A, B, C, order);
 }`;
-    setOutputs(instructions, jsCode);
+
+    let buttonInstructions =
+`Create these GeoGebra buttons.
+
+Button label:
+Setup Sierpinski controls
+
+On Click JavaScript:
+setupSierpinskiControls();
+
+Button label:
+Build Sierpinski triangle
+
+On Click JavaScript:
+buildSierpinski();
+`;
+
+    setOutputs(instructions, jsCode, "", buttonInstructions);
 }
 
 function generateGeoGebraBirthDeathProcess() {
@@ -4650,8 +5457,8 @@ function generateGeoGebraBirthDeathProcess() {
 
     let commandCode =
 `// Paste the JavaScript below into GeoGebra Global JavaScript.
-// Then create a GeoGebra button with:
-// runBirthDeath();`;
+// Use the GeoGebra Button Setup panel for the required button calls.
+`;
 
     let jsCode =
 `function runBirthDeath() {
@@ -4785,7 +5592,7 @@ On Click JavaScript:
 clearBirthDeathProcess();
 `;
 
-    setOutputs(commands, code, "", buttonInstructions);
+    setOutputs(commandCode, jsCode, "", buttonInstructions);
 }
 
 function generateGeoGebraBirthDeathStats() {
@@ -4799,8 +5606,8 @@ function generateGeoGebraBirthDeathStats() {
 
     let commandCode =
 `// Paste the JavaScript below into GeoGebra Global JavaScript.
-// Then create a GeoGebra button with:
-// runBirthDeathStats();`;
+// Use the GeoGebra Button Setup panel for the required button calls.
+`;
 
     let jsCode =
 `function runBirthDeathStats() {
@@ -5008,8 +5815,8 @@ function generateGeoGebraBirthDeathSamplePaths() {
 
     let commandCode =
 `// Paste the JavaScript below into GeoGebra Global JavaScript.
-// Then create a GeoGebra button with:
-// runBirthDeathSamplePaths();`;
+// Use the GeoGebra Button Setup panel for the required button calls.
+`;
 
     let jsCode =
 `function runBirthDeathSamplePaths() {
@@ -5676,8 +6483,7 @@ scene.frame_set(1)
 
 print("VMF DNA Double Helix with Base Pairs created.")
 `;
-
-    setOutputs(existingCommands, existingJS, blenderCode);
+    setOutputs(existingCommands, existingJS, blenderCode, "");
 }
 
 function generateGeoGebraDoubleHelix() {
@@ -6094,13 +6900,7 @@ function buildDNAHelix() {
     updateSNPDisplay();
 }`;
 
-    let blenderCode =
-`# Blender Python placeholder
-# DNA Double Helix with SNP can be added here later.
-# For now, use the GeoGebra Global JavaScript version.`;
-
-    document.getElementById("descriptionBox").innerHTML = instructions;
-    setOutputs(commands, code, blenderCode);
+    setOutputs(commands, code, "", "");
 }
 
 function generateDNADoubleHelixSNP() {
@@ -7001,33 +7801,15 @@ function runCellBranchingStats() {
 
 function generateGeoGebraCellBranchingCombined() {
 
-    let instructions =
+   let instructions =
 `Biological Cell Branching: Tree + Statistics
 
 This combined object builds a biological cell-branching tree and also runs repeated-trial statistics.
 
-Create GeoGebra buttons with these JavaScript commands:
+Paste the JavaScript code from the GeoGebra Global JavaScript panel
+into GeoGebra's Global JavaScript section.
 
-1. Setup controls
-
-setupCellBranchingControls();
-
-2. Build / rebuild visible tree
-
-buildCellBranching();
-showCellBranchingTree();
-
-3. Run repeated-trial statistics
-
-runCellBranchingStats();
-
-4. Show statistics display
-
-showCellBranchingStats();
-
-5. Return to tree display
-
-showCellBranchingTree();
+Use the GeoGebra Button Setup panel for the required button calls.
 
 Suggested control values:
 
@@ -7056,6 +7838,41 @@ cellP2 = proliferation / two-child probability
 Display-box note:
 
 The arrays CellTreeDisplayObjects and CellStatsDisplayObjects must contain the actual GeoGebra object names of your green input boxes and labels.`;
+
+    let buttonInstructions =
+`Create these GeoGebra buttons.
+
+Button label:
+Setup controls
+
+On Click JavaScript:
+setupCellBranchingControls();
+
+Button label:
+Build / rebuild visible tree
+
+On Click JavaScript:
+buildCellBranching();
+showCellBranchingTree();
+
+Button label:
+Run repeated-trial statistics
+
+On Click JavaScript:
+runCellBranchingStats();
+
+Button label:
+Show statistics display
+
+On Click JavaScript:
+showCellBranchingStats();
+
+Button label:
+Return to tree display
+
+On Click JavaScript:
+showCellBranchingTree();
+`;
 
     let code =
 `// GeoGebra Global JavaScript
@@ -7936,7 +8753,7 @@ function runCellBranchingStats() {
     hideCellStatsDisplayObjects();
 }`;
 
-    setOutputs(instructions, code);
+    setOutputs(instructions, code, "", buttonInstructions);
 }
 
 function generateGeoGebraReactionDiffusion() {
@@ -7957,34 +8774,6 @@ The scientific idea:
 
 Two substances spread across a surface while also reacting locally. One substance feeds the system, while the other grows, spreads, and is removed. The competition between local reaction and diffusion can produce organised patterns from a small initial disturbance.
 
-Presentation buttons:
-
-setupReactionDiffusion();
-
-presetRDSpots();
-
-presetRDMaze();
-
-presetRDStripes();
-
-stepReactionDiffusion();
-
-clearReactionDiffusion();
-
-Suggested button labels:
-
-Setup    → setupReactionDiffusion();
-
-Spots    → presetRDSpots();
-
-Maze     → presetRDMaze();
-
-Stripes  → presetRDStripes();
-
-Step     → stepReactionDiffusion();
-
-Clear    → clearReactionDiffusion();
-
 Preset meanings:
 
 Spots: tends toward separated local patches.
@@ -7998,12 +8787,9 @@ Suggested workflow:
 3. Press Step to continue evolving the current pattern.
 4. Press Clear to remove the display.
 
-This version uses a 30 x 30 point grid for improved pattern detail.`;
+This version uses a 30 x 30 point grid for improved pattern detail.
 
-    let commands =
-`// Reaction-Diffusion Pattern Formation
-// No GeoGebra Input Commands are required.
-// Paste the Global JavaScript into GeoGebra Global JavaScript.`;
+Use the GeoGebra Button Setup panel for the required button calls.`;
 
     let code =
 `// GeoGebra Global JavaScript
@@ -8479,8 +9265,48 @@ function setupReactionDiffusion() {
     );
 }`;
 
-    document.getElementById("descriptionBox").innerHTML = instructions;
-    setOutputs(commands, code);
+    let buttonInstructions =
+`Create these GeoGebra buttons.
+
+Button label:
+Setup
+
+On Click JavaScript:
+setupReactionDiffusion();
+
+Button label:
+Spots
+
+On Click JavaScript:
+presetRDSpots();
+
+Button label:
+Maze
+
+On Click JavaScript:
+presetRDMaze();
+
+Button label:
+Stripes
+
+On Click JavaScript:
+presetRDStripes();
+
+Button label:
+Step
+
+On Click JavaScript:
+stepReactionDiffusion();
+
+Button label:
+Clear
+
+On Click JavaScript:
+clearReactionDiffusion();
+`;
+
+    setOutputs(instructions, code, "", buttonInstructions);
+
 }
 
 function generateGeoGebraDiffusionLimitedAggregation() {
@@ -8494,26 +9320,6 @@ Scientific idea:
 
 Particles wander randomly. When a wandering particle touches the existing cluster, it sticks permanently. Repeating this many times can create branching, coral-like, mineral-like, or lightning-like structures.
 
-Presentation buttons:
-
-setupDLA();
-
-runDLAWalkers(50);
-
-runDLAWalkers(200);
-
-clearDLA();
-
-Suggested button labels:
-
-Setup       → setupDLA();
-
-Run 50      → runDLAWalkers(50);
-
-Run 200     → runDLAWalkers(200);
-
-Clear       → clearDLA();
-
 Suggested workflow:
 
 1. Press Setup.
@@ -8521,12 +9327,9 @@ Suggested workflow:
 3. Press Run 50 again, or Run 200 for faster growth.
 4. Press Clear to remove the display.
 
-This first version uses point objects for stability.`;
+This first version uses point objects for stability.
 
-    let commands =
-`// Diffusion-Limited Aggregation
-// No GeoGebra Input Commands are required.
-// Paste the Global JavaScript into GeoGebra Global JavaScript.`;
+Use the GeoGebra Button Setup panel for the required button calls.`;
 
     let code =
 `// GeoGebra Global JavaScript
@@ -8849,8 +9652,35 @@ function updateDLAText() {
     dlaWriteText("DLATextIdea", "Drifting particles attach to a growing deposit", 4.0, 1.0);
 }`;
 
-    document.getElementById("descriptionBox").innerHTML = instructions;
-    setOutputs(commands, code);
+    let buttonInstructions =
+`Create these GeoGebra buttons.
+
+Button label:
+Setup
+
+On Click JavaScript:
+setupDLA();
+
+Button label:
+Run 50
+
+On Click JavaScript:
+runDLAWalkers(50);
+
+Button label:
+Run 200
+
+On Click JavaScript:
+runDLAWalkers(200);
+
+Button label:
+Clear
+
+On Click JavaScript:
+clearDLA();
+`;
+
+    setOutputs(instructions, code, "", buttonInstructions);
 }
 
 function generateGeoGebraSierpinskiIcosahedron() {
@@ -8858,34 +9688,20 @@ function generateGeoGebraSierpinskiIcosahedron() {
     let instructions =
 `Sierpinski Icosahedron
 
-Stage 2A generator.
+This model builds a recursive 3D Sierpinski-style icosahedron.
 
-This version creates a regular icosahedron frame and decorates all 20 triangular faces with Sierpinski-style recursive triangle patterns.
+Paste the JavaScript code from the GeoGebra Global JavaScript panel
+into GeoGebra's Global JavaScript section.
 
-Purpose of this stage:
+Use the GeoGebra Button Setup panel for the required button calls.
 
-1. Confirm the icosahedron geometry.
-2. Confirm that Sierpinski subdivision can be mapped onto every triangular face.
-3. Keep the object light enough for GeoGebra by using order 2.
-4. Prepare for later styling and rotation controls.
+Suggested workflow:
 
-Presentation buttons:
+1. Press Setup.
+2. Press Build.
+3. Press Clear if you want to remove the construction.
 
-setupSierpinskiIcosahedron();
-
-clearSierpinskiIcosahedron();
-
-Suggested button labels:
-
-Setup Sierpinski Icosahedron
-Clear Sierpinski Icosahedron
-
-This version decorates all 20 faces at Sierpinski order 2.`;
-
-    let commands =
-`// Sierpinski Icosahedron
-// No GeoGebra Input Commands are required.
-// Paste the Global JavaScript into GeoGebra Global JavaScript.`;
+Higher recursion orders create many objects and may slow GeoGebra.`;
 
     let code =
 `// GeoGebra Global JavaScript
@@ -9266,8 +10082,6 @@ function setupSierpinskiIcosahedron() {
         "All 20 triangular faces have been decorated with filled Sierpinski patterns."
     );
 }`;
-
-    document.getElementById("descriptionBox").innerHTML = instructions;
 
     const blenderSIOrder = Number(document.getElementById("blenderSIOrder").value);
     const blenderSIRadius = Number(document.getElementById("blenderSIRadius").value);
@@ -9723,17 +10537,520 @@ bpy.ops.object.select_all(action="DESELECT")
 empty.select_set(True)
 bpy.context.view_layer.objects.active = empty
 `;
-    setOutputs(commands, code, blenderCode);
+    let buttonInstructions =
+`Create these GeoGebra buttons.
+
+Button label:
+Setup
+
+On Click JavaScript:
+setupSierpinskiIcosahedron();
+
+Button label:
+Build
+
+On Click JavaScript:
+buildSierpinskiIcosahedron();
+
+Button label:
+Clear
+
+On Click JavaScript:
+clearSierpinskiIcosahedron();
+`;
+
+    setOutputs(instructions, code, blenderCode, buttonInstructions);
+}
+
+function generateGeoGebraEpidemicBranching() {
+
+    let p = document.getElementById("epiP").value;
+    let contacts = document.getElementById("epiContacts").value;
+    let generations = document.getElementById("epiGenerations").value;
+    let lengthFactor = document.getElementById("epiLengthFactor").value;
+    let angle = document.getElementById("epiAngle").value;
+    let jitter = document.getElementById("epiJitter").value;
+    let maxCases = document.getElementById("epiMaxCases").value;
+
+    let instructions =
+`Epidemic Branching Process
+
+This GeoGebra model shows a simple epidemic branching process.
+
+Scientific idea:
+
+One infected person has a fixed number of possible contacts.
+
+Each contact becomes infected with probability p.
+
+The number of new infections in each generation is therefore random.
+
+The key threshold is:
+
+R = contacts × transmission probability
+
+If R is below 1, outbreaks usually die out.
+
+If R is above 1, outbreaks may grow.
+
+Suggested workflow:
+
+1. Press Setup controls.
+2. Press Build epidemic tree.
+3. Change the sliders if desired.
+4. Press Build epidemic tree again.
+5. Press Run outbreak statistics to estimate extinction probability.
+6. Press Clear to remove the display.
+
+Use the GeoGebra Button Setup panel for the required button calls.`;
+
+    let code =
+`// GeoGebra Global JavaScript
+// Epidemic Branching Process
+
+var EPI = {
+    objects: [],
+    caseCount: 0,
+    generationReached: 0,
+
+    p: ${p},
+    contacts: ${contacts},
+    generations: ${generations},
+    lengthFactor: ${lengthFactor},
+    angle: ${angle},
+    jitter: ${jitter},
+    maxCases: ${maxCases}
+};
+
+function setupEpidemicControls() {
+
+    if (!ggbApplet.exists("epiP")) {
+        ggbApplet.evalCommand("epiP = " + EPI.p);
+        ggbApplet.setLabelVisible("epiP", true);
+    }
+
+    if (!ggbApplet.exists("epiContacts")) {
+        ggbApplet.evalCommand("epiContacts = " + EPI.contacts);
+        ggbApplet.setLabelVisible("epiContacts", true);
+    }
+
+    if (!ggbApplet.exists("epiGenerations")) {
+        ggbApplet.evalCommand("epiGenerations = " + EPI.generations);
+        ggbApplet.setLabelVisible("epiGenerations", true);
+    }
+
+    if (!ggbApplet.exists("epiLengthFactor")) {
+        ggbApplet.evalCommand("epiLengthFactor = " + EPI.lengthFactor);
+        ggbApplet.setLabelVisible("epiLengthFactor", true);
+    }
+
+    if (!ggbApplet.exists("epiAngle")) {
+        ggbApplet.evalCommand("epiAngle = " + EPI.angle);
+        ggbApplet.setLabelVisible("epiAngle", true);
+    }
+
+    if (!ggbApplet.exists("epiJitter")) {
+        ggbApplet.evalCommand("epiJitter = " + EPI.jitter);
+        ggbApplet.setLabelVisible("epiJitter", true);
+    }
+
+    if (!ggbApplet.exists("epiMaxCases")) {
+        ggbApplet.evalCommand("epiMaxCases = " + EPI.maxCases);
+        ggbApplet.setLabelVisible("epiMaxCases", true);
+    }
+
+    alert(
+        "Epidemic controls created.\\n\\n" +
+        "Suggested slider settings:\\n\\n" +
+        "epiP: 0 to 1, increment 0.01\\n" +
+        "epiContacts: 0 to 8, increment 1\\n" +
+        "epiGenerations: 1 to 12, increment 1\\n" +
+        "epiLengthFactor: 0.3 to 0.9, increment 0.05\\n" +
+        "epiAngle: 5 to 60, increment 1\\n" +
+        "epiJitter: 0 to 30, increment 1\\n" +
+        "epiMaxCases: 50 to 2000, increment 50"
+    );
+}
+
+function readEpidemicControls() {
+
+    if (!ggbApplet.exists("epiP")) {
+        ggbApplet.evalCommand("epiP = " + EPI.p);
+    }
+
+    if (!ggbApplet.exists("epiContacts")) {
+        ggbApplet.evalCommand("epiContacts = " + EPI.contacts);
+    }
+
+    if (!ggbApplet.exists("epiGenerations")) {
+        ggbApplet.evalCommand("epiGenerations = " + EPI.generations);
+    }
+
+    if (!ggbApplet.exists("epiLengthFactor")) {
+        ggbApplet.evalCommand("epiLengthFactor = " + EPI.lengthFactor);
+    }
+
+    if (!ggbApplet.exists("epiAngle")) {
+        ggbApplet.evalCommand("epiAngle = " + EPI.angle);
+    }
+
+    if (!ggbApplet.exists("epiJitter")) {
+        ggbApplet.evalCommand("epiJitter = " + EPI.jitter);
+    }
+
+    if (!ggbApplet.exists("epiMaxCases")) {
+        ggbApplet.evalCommand("epiMaxCases = " + EPI.maxCases);
+    }
+
+    EPI.p = ggbApplet.getValue("epiP");
+    EPI.contacts = Math.round(ggbApplet.getValue("epiContacts"));
+    EPI.generations = Math.round(ggbApplet.getValue("epiGenerations"));
+    EPI.lengthFactor = ggbApplet.getValue("epiLengthFactor");
+    EPI.angle = ggbApplet.getValue("epiAngle");
+    EPI.jitter = ggbApplet.getValue("epiJitter");
+    EPI.maxCases = Math.round(ggbApplet.getValue("epiMaxCases"));
+
+    if (EPI.p < 0) {
+        EPI.p = 0;
+    }
+
+    if (EPI.p > 1) {
+        EPI.p = 1;
+    }
+
+    if (EPI.contacts < 0) {
+        EPI.contacts = 0;
+    }
+
+    if (EPI.contacts > 12) {
+        alert("epiContacts is large. Using 12 instead.");
+        EPI.contacts = 12;
+    }
+
+    if (EPI.generations < 1) {
+        EPI.generations = 1;
+    }
+
+    if (EPI.generations > 15) {
+        alert("epiGenerations is large. Using 15 instead.");
+        EPI.generations = 15;
+    }
+
+    if (EPI.lengthFactor <= 0) {
+        EPI.lengthFactor = ${lengthFactor};
+    }
+
+    if (EPI.maxCases < 1) {
+        EPI.maxCases = 1;
+    }
+}
+
+function clearEpidemic() {
+
+    for (var i = ggbApplet.getObjectNumber() - 1; i >= 0; i--) {
+        try {
+            var obj = ggbApplet.getObjectName(i);
+
+            if (
+                obj.indexOf("EPI_B_") === 0 ||
+                obj.indexOf("EPI_C_") === 0 ||
+                obj.indexOf("EPI_Text") === 0 ||
+                obj === "EPI_R" ||
+                obj === "EPI_TotalCases" ||
+                obj === "EPI_FinalGenerationReached" ||
+                obj === "EPI_ExtinctEarly" ||
+                obj === "EPI_Trials" ||
+                obj === "EPI_ExtinctionRate" ||
+                obj === "EPI_OutbreakRate"
+            ) {
+                ggbApplet.deleteObject(obj);
+            }
+        } catch(e) {}
+    }
+
+    EPI.objects = [];
+    EPI.caseCount = 0;
+    EPI.generationReached = 0;
+}
+
+function epiRandomBetween(a, b) {
+    return a + Math.random() * (b - a);
+}
+
+function epiDegreesToRadians(deg) {
+    return deg * Math.PI / 180;
+}
+
+function epiSetNumber(name, value) {
+
+    if (!ggbApplet.exists(name)) {
+        ggbApplet.evalCommand(name + " = " + value);
+    } else {
+        ggbApplet.evalCommand("SetValue(" + name + ", " + value + ")");
+    }
+
+    try {
+        ggbApplet.setVisible(name, false);
+        ggbApplet.setLabelVisible(name, false);
+    } catch(e) {}
+}
+
+function epiWriteText(name, text, x, y) {
+
+    try {
+        if (ggbApplet.exists(name)) {
+            ggbApplet.deleteObject(name);
+        }
+
+        var safe = String(text).replace(/"/g, "'");
+        ggbApplet.evalCommand(name + ' = Text("' + safe + '", (' + x + ',' + y + '))');
+        ggbApplet.setLabelVisible(name, false);
+        ggbApplet.setColor(name, 40, 40, 40);
+    } catch(e) {}
+}
+
+function epiDrawCase(x, y, generation) {
+
+    var caseName = "EPI_C_" + EPI.caseCount;
+
+    ggbApplet.evalCommand(caseName + " = (" + x + "," + y + ")");
+
+    try {
+        ggbApplet.setLabelVisible(caseName, false);
+
+        if (generation === 0) {
+            ggbApplet.setColor(caseName, 220, 40, 40);
+            ggbApplet.setPointSize(caseName, 8);
+        } else {
+            var red = Math.min(255, 120 + generation * 18);
+            var green = Math.max(40, 150 - generation * 8);
+            var blue = Math.max(40, 120 - generation * 8);
+
+            ggbApplet.setColor(caseName, red, green, blue);
+            ggbApplet.setPointSize(caseName, 5);
+        }
+    } catch(e) {}
+
+    EPI.objects.push(caseName);
+    EPI.caseCount++;
+
+    return caseName;
+}
+
+function epiDrawTransmission(x1, y1, x2, y2, generation) {
+
+    var branchName = "EPI_B_" + EPI.objects.length;
+
+    ggbApplet.evalCommand(
+        branchName + " = Segment((" + x1 + "," + y1 + "),(" + x2 + "," + y2 + "))"
+    );
+
+    try {
+        ggbApplet.setLabelVisible(branchName, false);
+
+        var red = Math.min(255, 130 + generation * 14);
+        var green = Math.max(50, 130 - generation * 8);
+        var blue = Math.max(50, 130 - generation * 8);
+
+        ggbApplet.setColor(branchName, red, green, blue);
+        ggbApplet.setLineThickness(branchName, Math.max(2, 5 - generation * 0.2));
+    } catch(e) {}
+
+    EPI.objects.push(branchName);
+}
+
+function growEpidemic(x, y, length, direction, generation) {
+
+    if (generation > EPI.generations) {
+        return;
+    }
+
+    if (EPI.caseCount >= EPI.maxCases) {
+        return;
+    }
+
+    if (generation > EPI.generationReached) {
+        EPI.generationReached = generation;
+    }
+
+    var infectedChildren = [];
+
+    for (var c = 0; c < EPI.contacts; c++) {
+        if (Math.random() < EPI.p) {
+            infectedChildren.push(c);
+        }
+    }
+
+    if (infectedChildren.length === 0) {
+        return;
+    }
+
+    var spread = EPI.angle * Math.max(1, infectedChildren.length - 1);
+
+    for (var i = 0; i < infectedChildren.length; i++) {
+
+        if (EPI.caseCount >= EPI.maxCases) {
+            return;
+        }
+
+        var offset;
+
+        if (infectedChildren.length === 1) {
+            offset = 0;
+        } else {
+            offset = -spread / 2 + i * spread / (infectedChildren.length - 1);
+        }
+
+        var randomError = epiRandomBetween(-EPI.jitter, EPI.jitter);
+        var childDirection = direction + epiDegreesToRadians(offset + randomError);
+
+        var x2 = x + length * Math.cos(childDirection);
+        var y2 = y + length * Math.sin(childDirection);
+
+        epiDrawTransmission(x, y, x2, y2, generation);
+        epiDrawCase(x2, y2, generation);
+
+        growEpidemic(
+            x2,
+            y2,
+            length * EPI.lengthFactor,
+            childDirection,
+            generation + 1
+        );
+    }
+}
+
+function buildEpidemicTree() {
+
+    readEpidemicControls();
+    clearEpidemic();
+
+    epiDrawCase(0, 0, 0);
+
+    growEpidemic(
+        0,
+        0,
+        4,
+        Math.PI / 2,
+        1
+    );
+
+    var R = EPI.contacts * EPI.p;
+    var extinctEarly = 0;
+
+    if (EPI.generationReached < EPI.generations) {
+        extinctEarly = 1;
+    }
+
+    epiSetNumber("EPI_R", Number(R.toFixed(3)));
+    epiSetNumber("EPI_TotalCases", EPI.caseCount);
+    epiSetNumber("EPI_FinalGenerationReached", EPI.generationReached);
+    epiSetNumber("EPI_ExtinctEarly", extinctEarly);
+
+    epiWriteText("EPI_TextTitle", "Epidemic Branching Process", 4.5, 3.0);
+    epiWriteText("EPI_TextR", "R = " + R.toFixed(2), 4.5, 2.6);
+    epiWriteText("EPI_TextCases", "Total cases = " + EPI.caseCount, 4.5, 2.2);
+    epiWriteText("EPI_TextGeneration", "Generation reached = " + EPI.generationReached, 4.5, 1.8);
+}
+
+function simulateEpidemicOnce() {
+
+    var population = 1;
+
+    for (var gen = 1; gen <= EPI.generations; gen++) {
+
+        var nextPopulation = 0;
+
+        for (var i = 0; i < population; i++) {
+            for (var c = 0; c < EPI.contacts; c++) {
+                if (Math.random() < EPI.p) {
+                    nextPopulation++;
+                }
+            }
+        }
+
+        population = nextPopulation;
+
+        if (population === 0) {
+            return true;
+        }
+
+        if (population > EPI.maxCases) {
+            return false;
+        }
+    }
+
+    return false;
+}
+
+function runEpidemicStatistics() {
+
+    readEpidemicControls();
+
+    var trials = 200;
+    var extinctCount = 0;
+
+    for (var t = 0; t < trials; t++) {
+        if (simulateEpidemicOnce()) {
+            extinctCount++;
+        }
+    }
+
+    var extinctionRate = extinctCount / trials;
+    var outbreakRate = 1 - extinctionRate;
+
+    var R = EPI.contacts * EPI.p;
+
+    epiSetNumber("EPI_Trials", trials);
+    epiSetNumber("EPI_ExtinctionRate", Number(extinctionRate.toFixed(3)));
+    epiSetNumber("EPI_OutbreakRate", Number(outbreakRate.toFixed(3)));
+
+    epiWriteText("EPI_TextStatsTitle", "Outbreak statistics", 4.5, 1.2);
+    epiWriteText("EPI_TextTrials", "Trials = " + trials, 4.5, 0.8);
+    epiWriteText("EPI_TextExtinction", "Extinction rate = " + extinctionRate.toFixed(2), 4.5, 0.4);
+    epiWriteText("EPI_TextOutbreak", "Outbreak rate = " + outbreakRate.toFixed(2), 4.5, 0.0);
+    epiWriteText("EPI_TextThreshold", "R = " + R.toFixed(2), 4.5, -0.4);
+}`;
+
+    let buttonInstructions =
+`Create these GeoGebra buttons.
+
+Button label:
+Setup controls
+
+On Click JavaScript:
+setupEpidemicControls();
+
+Button label:
+Build epidemic tree
+
+On Click JavaScript:
+buildEpidemicTree();
+
+Button label:
+Run outbreak statistics
+
+On Click JavaScript:
+runEpidemicStatistics();
+
+Button label:
+Clear
+
+On Click JavaScript:
+clearEpidemic();
+`;
+
+    setOutputs(instructions, code, "", buttonInstructions);
 }
 
 function generateGeoGebraGeneticDrift() {
 
     let instructions =
-`Genetic Drift
+`Genetic Drift: Frequency Plot
 
 Stage 2 generator.
 
-This GeoGebra model shows one random allele-frequency path over generations.
+This GeoGebra model shows one or more random allele-frequency paths over generations.
 
 Biological story:
 
@@ -9750,45 +11067,18 @@ Eventually the allele may be lost, where p = 0, or fixed, where p = 1.
 Model rule:
 
 Population size: N
-
 Allele copies: 2N
-
 Current allele frequency: p
-
 Next generation count: random sample from 2N allele copies
-
 Next frequency: sampled count / 2N
-
-Presentation buttons:
-
-setupGeneticDrift();
-
-runGeneticDriftPath();
-
-runGeneticDriftPaths();
-
-runGeneticDriftComparison();
-
-clearGeneticDrift();
-
-Suggested button labels:
-
-Setup
-Run One Path
-Run Many Paths
-Compare Small and Large N
-Clear
 
 Stage 2 includes both a single allele-frequency path and multiple sample paths.
 
 Run One Path draws one random drift path.
 
-Run Many Paths draws several faint paths and counts how many are lost, fixed, or still drifting.`;
+Run Many Paths draws several faint paths and counts how many are lost, fixed, or still drifting.
 
-    let commands =
-`// Genetic Drift
-// No GeoGebra Input Commands are required.
-// Paste the Global JavaScript into GeoGebra Global JavaScript.`;
+Use the GeoGebra Button Setup panel for the required button calls.`;
 
     let code =
 `// GeoGebra Global JavaScript
@@ -10343,7 +11633,7 @@ On Click JavaScript:
 clearGeneticDrift();
 `;
 
-    setOutputs(commands, code, "", buttonInstructions);
+    setOutputs(instructions, code, "", buttonInstructions);
 }
 
 function generateGeoGebraGeneticDriftBranching() {

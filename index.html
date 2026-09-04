@@ -242,6 +242,42 @@ Object:
 
 </div>
 
+<div id="torusDoubleHelixPanel" style="display:none;">
+
+<h2>Torus with Double Helix</h2>
+
+<p>
+Major radius:
+<input type="number" id="tdhMajorRadius" value="3" min="0.5" step="0.1">
+</p>
+
+<p>
+Tube radius:
+<input type="number" id="tdhTubeRadius" value="1" min="0.1" step="0.1">
+</p>
+
+<p>
+Helix windings:
+<input type="number" id="tdhWindings" value="8" min="1" step="1">
+</p>
+
+<p>
+Strand offset:
+<input type="number" id="tdhStrandOffset" value="0.65" min="0.1" step="0.05">
+</p>
+
+<p>
+Rung count:
+<input type="number" id="tdhRungCount" value="48" min="4" step="1">
+</p>
+
+<p>
+Lift above torus:
+<input type="number" id="tdhLift" value="0.08" min="0" step="0.01">
+</p>
+
+</div>
+
 <div id="torusSurfacePanel" style="display:none;">
 
 <h2>Torus Surface</h2>
@@ -913,6 +949,47 @@ Trials:
 
 <p>Maximum events:
 <input type="number" id="bdMaxEvents" value="200" step="10">
+</p>
+
+</div>
+
+<div id="epidemicBranchingPanel" style="display:none;">
+
+<h2>Epidemic Branching Process</h2>
+
+<p>
+Transmission probability:
+<input type="number" id="epiP" value="0.35" min="0" max="1" step="0.01">
+</p>
+
+<p>
+Contacts per infected person:
+<input type="number" id="epiContacts" value="3" min="0" step="1">
+</p>
+
+<p>
+Generations:
+<input type="number" id="epiGenerations" value="8" min="1" step="1">
+</p>
+
+<p>
+Length factor:
+<input type="number" id="epiLengthFactor" value="0.75" min="0.1" step="0.05">
+</p>
+
+<p>
+Branch angle:
+<input type="number" id="epiAngle" value="25" min="1" step="1">
+</p>
+
+<p>
+Random jitter:
+<input type="number" id="epiJitter" value="15" min="0" step="1">
+</p>
+
+<p>
+Maximum cases:
+<input type="number" id="epiMaxCases" value="500" min="1" step="10">
 </p>
 
 </div>
