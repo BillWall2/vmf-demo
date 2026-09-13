@@ -2215,7 +2215,7 @@ function updatePreviews() {
 
         case "epidemicBranching":
             geoGebraPreview =
-            "<p>GeoGebra preview not yet available for Epidemic Branching Process.</p>";
+            '<img src="media/epidemicBranchingProcess.png" alt="GeoGebra epidemic branching preview">';
             blenderPreview =
             "<p>Blender preview not yet available for this object.</p>";
         break;
@@ -10747,6 +10747,8 @@ function readEpidemicControls() {
 
 function clearEpidemic() {
 
+    clearEpidemicNarrative();
+
     for (var i = ggbApplet.getObjectNumber() - 1; i >= 0; i--) {
         try {
             var obj = ggbApplet.getObjectName(i);
@@ -10924,6 +10926,7 @@ function buildEpidemicTree() {
 
     readEpidemicControls();
     clearEpidemic();
+    clearEpidemicNarrative();
 
     epiDrawCase(0, 0, 0);
 
@@ -10951,6 +10954,98 @@ function buildEpidemicTree() {
     epiWriteText("EPI_TextR", "R = " + R.toFixed(2), 4.5, 2.6);
     epiWriteText("EPI_TextCases", "Total cases = " + EPI.caseCount, 4.5, 2.2);
     epiWriteText("EPI_TextGeneration", "Generation reached = " + EPI.generationReached, 4.5, 1.8);
+}
+
+function clearEpidemicNarrative() {
+
+    for (var i = ggbApplet.getObjectNumber() - 1; i >= 0; i--) {
+        try {
+            var obj = ggbApplet.getObjectName(i);
+
+            if (obj.indexOf("EPI_Narrative_") === 0) {
+                ggbApplet.deleteObject(obj);
+            }
+        } catch(e) {}
+    }
+}
+
+function epiWriteColouredText(name, text, x, y, red, green, blue) {
+
+    epiWriteText(name, text, x, y);
+
+    try {
+        ggbApplet.setColor(name, red, green, blue);
+    } catch(e) {}
+}
+
+function summariseEpidemicRun() {
+
+    readEpidemicControls();
+    clearEpidemicNarrative();
+
+    var R = EPI.contacts * EPI.p;
+
+    var thresholdComment = "";
+
+    if (R < 1) {
+        thresholdComment =
+            "R is below 1, so this outbreak is below the critical threshold.";
+    } else if (Math.abs(R - 1) < 0.001) {
+        thresholdComment =
+            "R is approximately 1, so this outbreak is close to the critical threshold.";
+    } else {
+        thresholdComment =
+            "R is above 1, so this outbreak is above the critical threshold.";
+    }
+
+    epiWriteColouredText(
+        "EPI_Narrative_1",
+        "Narrative summary:",
+        4.6, -0.8, 0, 70, 150
+    );
+
+    epiWriteColouredText(
+        "EPI_Narrative_2",
+        "The simulation begins with one infected individual.",
+        4.6, -1.2, 40, 90, 130
+    );
+
+    epiWriteColouredText(
+        "EPI_Narrative_3",
+        "Each infected case has up to " + EPI.contacts + " possible contacts.",
+        4.6, -1.6, 40, 90, 130
+    );
+
+    epiWriteColouredText(
+        "EPI_Narrative_4",
+        "Each contact is infected with probability " + EPI.p.toFixed(2) + ".",
+        4.6, -2.0, 40, 90, 130
+    );
+
+    epiWriteColouredText(
+        "EPI_Narrative_5",
+        "The expected number of new infections is R = " + R.toFixed(2) + ".",
+        4.6, -2.4, 40, 90, 130
+    );
+
+    epiWriteColouredText(
+        "EPI_Narrative_6",
+        thresholdComment,
+        4.6, -2.8, 40, 90, 130
+    );
+
+    epiWriteColouredText(
+        "EPI_Narrative_7",
+        "This run produced " + EPI.caseCount +
+        " total cases and reached generation " + EPI.generationReached + ".",
+        4.6, -3.2, 40, 90, 130
+    );
+
+    epiWriteColouredText(
+        "EPI_Narrative_8",
+        "A different run may produce a different tree because transmission is random.",
+        4.6, -3.6, 40, 90, 130
+    );
 }
 
 function simulateEpidemicOnce() {
@@ -11038,6 +11133,13 @@ Clear
 
 On Click JavaScript:
 clearEpidemic();
+
+
+Button label:
+Summarise epidemic run
+
+On Click JavaScript:
+summariseEpidemicRun();
 `;
 
     setOutputs(instructions, code, "", buttonInstructions);
@@ -13106,8 +13208,12 @@ function updateGDBText() {
             ggbApplet.deleteObject("GDBTextNext");
         }
 
-        if (ggbApplet.exists("GDBTextExplanation")) {
-            ggbApplet.deleteObject("GDBTextExplanation");
+        if (ggbApplet.exists("GDBTextExplanation1")) {
+            ggbApplet.deleteObject("GDBTextExplanation1");
+        }
+
+        if (ggbApplet.exists("GDBTextExplanation2")) {
+            ggbApplet.deleteObject("GDBTextExplanation2");
         }
 
         if (driftText !== "") {
@@ -13158,18 +13264,26 @@ function updateGDBText() {
             );
         }
     }
+    
+        ggbApplet.evalCommand(
+        'GDBTextExplanation1 = Text("Each random sample from the current generation creates one offspring", (0, ' +
+        (-gdbRowSeparation - 4.1).toFixed(4) + '))'
+        );
 
         ggbApplet.evalCommand(
-            'GDBTextExplanation = Text("Each lower circle randomly chooses an upper source copy and inherits its colour.", (0, ' +
-            (-gdbRowSeparation - 4.1).toFixed(4) + '))'
+        'GDBTextExplanation2 = Text("carrying the sampled colour.", (0, ' +
+        (-gdbRowSeparation - 4.7).toFixed(4) + '))'
         );
+
+
 
         hideGDBLabel("GDBTextCurrent");
         hideGDBLabel("GDBTextNext");
         hideGDBLabel("GDBTextDrift");
         hideGDBLabel("GDBTextAccept");
         hideGDBLabel("GDBTextFixation");
-        hideGDBLabel("GDBTextExplanation");
+        hideGDBLabel("GDBTextExplanation1");
+        hideGDBLabel("GDBTextExplanation2");
 
         try {
             ggbApplet.setColor("GDBTextDrift", 140, 80, 160);
@@ -13437,13 +13551,14 @@ function sampleGDBNextGeneration() {
     gdbParentChoices = [];
     gdbLastAcceptMessage = "";
 
-    for (var child = 0; child < gdbPopulationSize; child++) {
-        var parent = Math.floor(Math.random() * gdbPopulationSize);
-        var allele = gdbCurrentPopulation[parent];
+    for (var draw = 0; draw < gdbPopulationSize; draw++) {
 
-        gdbParentChoices.push(parent);
-        gdbNextPopulation.push(allele);
-    }
+    var source = Math.floor(Math.random() * gdbPopulationSize);
+    var allele = gdbCurrentPopulation[source];
+
+    gdbParentChoices.push(source);
+    gdbNextPopulation.push(allele);
+}
 
     drawGDBNextGeneration();
     drawGDBAncestryLines();
@@ -13568,5 +13683,7 @@ Clear
 On Click JavaScript:
 clearGeneticDriftBranching();
 `;
+    const blenderCode = "";
+
     setOutputs(commands, code, blenderCode, buttonInstructions);
 }
