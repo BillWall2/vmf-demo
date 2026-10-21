@@ -75,7 +75,9 @@ const framework = {
             { value: "cellBranchingCombined", label: "Biological Cell Branching: Tree + Statistics" },
             { value: "birthDeathProcess", label: "Continuous-Time Birth-Death Process" },
             { value: "birthDeathStats", label: "Birth-Death Extinction Statistics" },
-            { value: "birthDeathSamplePaths", label: "Birth-Death Sample Paths" }
+            { value: "birthDeathSamplePaths", label: "Birth-Death Sample Paths" },
+            { value: "gwPopulationDemo", label: "Galton-Watson Population Demo" },
+            { value: "offspringDistributionComparison", label: "Offspring Distribution: Poisson vs Negative Binomial" },
         ],
     },
 
@@ -98,7 +100,11 @@ const framework = {
             { value: "geneticDrift", label: "Genetic Drift: Frequency Plot" },
             { value: "geneticDriftGrid", label: "Genetic Drift: Grid Population" },
             { value: "geneticDriftBranchingAncestry", label: "Genetic Drift: Branching Ancestry" },
-            { value: "geneticDriftBranching", label: "Allele Branching: Galton-Watson" }
+            { value: "voterOffspringAnimation", label: "Voter Offspring Animation" },
+            { value: "geneticDriftBranching", label: "Allele Branching: Galton-Watson" },
+            { value: "geneticDriftGWAlleles", label: "Genetic Drift: Galton-Watson Alleles" },
+            { value: "geneticDriftGWComparison", label: "GW Allele Drift: κ Comparison" },
+            { value: "geneticDriftGWVarianceComparison", label: "GW Allele Drift: Poisson vs Negative Binomial" },
         ],
 
         "Epidemiology": [
@@ -439,8 +445,18 @@ function updateObjectPanel() {
         generateGeoGebraGeneticDriftGrid();
     } else if (objectType === "geneticDriftBranchingAncestry") {
          generateGeoGebraGeneticDriftBranchingAncestry();
+    } else if (objectType === "voterOffspringAnimation") {
+        // No special input panel required for this first version.
     } else if (objectType === "geneticDriftBranching") {
         generateGeoGebraGeneticDriftBranching();
+    } else if (objectType === "geneticDriftGWAlleles") {
+        // No special input panel yet.
+    } else if (objectType === "geneticDriftGWComparison") {
+        // No special input panel yet.
+    } else if (objectType === "geneticDriftGWVarianceComparison") {
+        // No special input panel yet.
+    } else if (objectType === "offspringDistributionComparison") {
+        // No special input panel yet.
     } else {
         document.getElementById("placeholderPanel").style.display = "block";
     }
@@ -559,8 +575,20 @@ function generateCode() {
         generateGeoGebraGeneticDriftGrid();
     } else if (objectType === "geneticDriftBranchingAncestry") {
         generateGeoGebraGeneticDriftBranchingAncestry();
+    } else if (objectType === "voterOffspringAnimation") {
+        generateGeoGebraVoterOffspringAnimation();
     } else if (objectType === "geneticDriftBranching") {
         generateGeoGebraGeneticDriftBranching();
+    } else if (objectType === "gwPopulationDemo") {
+        generateGeoGebraGWPopulationDemo();
+    } else if (objectType === "geneticDriftGWAlleles") {
+        generateGeoGebraGWAlleleDrift();
+    } else if (objectType === "geneticDriftGWComparison") {
+        generateGeoGebraGWAlleleDriftComparison();
+    } else if (objectType === "offspringDistributionComparison") {
+        generateGeoGebraOffspringDistributionComparison();
+    } else if (objectType === "geneticDriftGWVarianceComparison") {
+        generateGeoGebraGWVarianceComparison();
     } else {
         setOutputs("Generator not yet implemented for this object.");
     }
@@ -1676,6 +1704,11 @@ function updateDescription() {
         text = "A fixed-size ancestry model related to branching processes. Each next-generation allele copy randomly samples one source allele copy from the previous generation and inherits its colour. Some source copies leave no descendants, while others leave several, producing genetic drift.";
         break;
 
+        case "voterOffspringAnimation":
+            formula =
+            "One illustrative generation: parent descendant counts are 0, 1, and 2 within each colour group, while the total population remains fixed.";
+        break;
+
         case "epidemicBranching":
         text =
         "An epidemic branching-process model. One infected case can infect several contacts, and each possible transmission happens by chance. The model shows how an outbreak may die out quickly or grow across generations.";
@@ -2212,6 +2245,41 @@ function updatePreviews() {
             blenderPreview =
                 "<p>Blender preview not yet available for this object.</p>";
             break;
+
+        case "voterOffspringAnimation":
+            geoGebraPreview =
+                '<img src="media/voterOffspringAnimation.png" ' +
+                'alt="GeoGebra Voter Offspring Animation preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+        break;
+
+
+        case "geneticDriftGWAlleles":
+            geoGebraPreview =
+                '<img src="media/geneticDriftGWAlleles.png" ' +
+                'alt="GeoGebra Genetic Drift Galton-Watson Alleles preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+        break;
+
+
+        case "geneticDriftGWComparison":
+            geoGebraPreview =
+                '<img src="media/gwAlleleDriftKappaComparison.png" ' +
+                'alt="GeoGebra Galton-Watson allele drift kappa comparison preview">';
+            blenderPreview =
+            "<p>Blender preview not yet available for this object.</p>";
+        break;
+
+
+        case "gwPopulationDemo":
+            geoGebraPreview =
+                '<img src="media/galtonWatsonPopulationDemo.png" ' +
+                'alt="GeoGebra Galton-Watson population demo preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+         break;
 
         case "epidemicBranching":
             geoGebraPreview =
@@ -13686,4 +13754,3653 @@ clearGeneticDriftBranching();
     const blenderCode = "";
 
     setOutputs(commands, code, blenderCode, buttonInstructions);
+}
+
+function generateGeoGebraVoterOffspringAnimation() {
+
+    const commands =
+`// No automatic GeoGebra image placement is used in this version.
+// Insert and arrange the voter PNG images manually.
+// Then create the anchor points listed in the Button Instructions,
+// and paste the generated Global JavaScript.`;
+
+    const code =
+`// --------------------------------------------------
+// Voter Offspring Animation
+// Stage 2B: anchor-point version (no image movement)
+// --------------------------------------------------
+
+// Each link represents one offspring event.
+// parentAnchor = point just below the parent image
+// childAnchor  = point just above the child image
+// childImage   = offspring image to reveal
+
+var VOAlinks = [
+    { parentAnchor: "BP2A", childAnchor: "BC1A", childImage: "BlueChild1" },
+    { parentAnchor: "BP3A", childAnchor: "BC2A", childImage: "BlueChild2" },
+    { parentAnchor: "BP3A", childAnchor: "BC3A", childImage: "BlueChild3" },
+
+    { parentAnchor: "RP2A", childAnchor: "RC1A", childImage: "RedChild1"  },
+    { parentAnchor: "RP3A", childAnchor: "RC2A", childImage: "RedChild2"  },
+    { parentAnchor: "RP3A", childAnchor: "RC3A", childImage: "RedChild3"  }
+];
+
+// Parent images that always remain visible
+var VOAparentImages = [
+    "BlueParent1", "BlueParent2", "BlueParent3",
+    "RedParent1",  "RedParent2",  "RedParent3"
+];
+
+// Child images that are initially hidden and then appear
+var VOAchildImages = [
+    "BlueChild1", "BlueChild2", "BlueChild3",
+    "RedChild1",  "RedChild2",  "RedChild3"
+];
+
+// Irregular appearance times
+var VOAstartTimes = [1.0, 2.3, 3.5, 4.6, 6.0, 7.2];
+
+// Time taken for each ancestry line to grow
+var VOAgrowDuration = 0.8;
+
+// ---------- Utility functions ----------
+function clampVOA(value, low, high) {
+    return Math.max(low, Math.min(high, value));
+}
+
+function hideVOALabel(name) {
+    try {
+        ggbApplet.setLabelVisible(name, false);
+    } catch (e) {}
+}
+
+function hideVOAObject(name) {
+    try {
+        ggbApplet.setVisible(name, false);
+    } catch (e) {}
+    hideVOALabel(name);
+}
+
+function setVOALineStyle(lineName, childImageName) {
+    try {
+        if (childImageName.indexOf("Blue") === 0) {
+            ggbApplet.setColor(lineName, 0, 90, 220);
+        } else {
+            ggbApplet.setColor(lineName, 220, 40, 40);
+        }
+        ggbApplet.setLineThickness(lineName, 3);
+    } catch (e) {}
+}
+
+function getVOAPointCoords(pointName) {
+    return {
+        x: ggbApplet.getXcoord(pointName),
+        y: ggbApplet.getYcoord(pointName)
+    };
+}
+
+// ---------- Main functions ----------
+function initialiseVoterOffspringAnimation() {
+
+    // Create or reset slider t
+    if (!ggbApplet.exists("t")) {
+        ggbApplet.evalCommand("t = 0");
+    } else {
+        ggbApplet.setValue("t", 0);
+    }
+
+    try {
+        ggbApplet.setAnimating("t", false);
+    } catch (e) {}
+
+    // Keep parent images visible
+    for (var i = 0; i < VOAparentImages.length; i++) {
+        try {
+            ggbApplet.setVisible(VOAparentImages[i], true);
+            hideVOALabel(VOAparentImages[i]);
+        } catch (e) {}
+    }
+
+    // Hide child images initially
+    for (var j = 0; j < VOAchildImages.length; j++) {
+        try {
+            ggbApplet.setVisible(VOAchildImages[j], false);
+            hideVOALabel(VOAchildImages[j]);
+        } catch (e) {}
+    }
+
+    // Hide anchor points
+    var anchorNames = ["BP2A", "BP3A", "BC1A", "BC2A", "BC3A",
+                       "RP2A", "RP3A", "RC1A", "RC2A", "RC3A"];
+
+    for (var a = 0; a < anchorNames.length; a++) {
+        try {
+            ggbApplet.setVisible(anchorNames[a], false);
+            ggbApplet.setLabelVisible(anchorNames[a], false);
+        } catch (e) {}
+    }
+
+    // Remove old moving points and lines
+    for (var k = 0; k < VOAlinks.length; k++) {
+        var pointName = "VOAMove" + k;
+        var lineName  = "VOALine" + k;
+
+        if (ggbApplet.exists(lineName)) {
+            ggbApplet.deleteObject(lineName);
+        }
+        if (ggbApplet.exists(pointName)) {
+            ggbApplet.deleteObject(pointName);
+        }
+    }
+
+    updateVoterOffspringAnimation();
+}
+
+function updateVoterOffspringAnimation() {
+
+    var time = ggbApplet.getValue("t");
+
+    for (var i = 0; i < VOAlinks.length; i++) {
+
+        var link = VOAlinks[i];
+
+        if (!ggbApplet.exists(link.parentAnchor) || !ggbApplet.exists(link.childAnchor)) {
+            continue;
+        }
+
+        var start = VOAstartTimes[i];
+        var progress = clampVOA((time - start) / VOAgrowDuration, 0, 1);
+
+        var parentCoords = getVOAPointCoords(link.parentAnchor);
+        var childCoords  = getVOAPointCoords(link.childAnchor);
+
+        var px = parentCoords.x;
+        var py = parentCoords.y;
+
+        var cx = childCoords.x;
+        var cy = childCoords.y;
+
+        var mx = px + progress * (cx - px);
+        var my = py + progress * (cy - py);
+
+        var pointName = "VOAMove" + i;
+        var lineName  = "VOALine" + i;
+
+        if (time >= start) {
+
+            ggbApplet.evalCommand(
+                pointName + " = (" +
+                mx.toFixed(4) + "," +
+                my.toFixed(4) + ")"
+            );
+
+            ggbApplet.evalCommand(
+                lineName + " = Segment((" +
+                px.toFixed(4) + "," +
+                py.toFixed(4) + ")," +
+                pointName + ")"
+            );
+
+            hideVOAObject(pointName);
+            hideVOALabel(lineName);
+            setVOALineStyle(lineName, link.childImage);
+
+        } else {
+
+            if (ggbApplet.exists(lineName)) {
+                ggbApplet.deleteObject(lineName);
+            }
+
+            if (ggbApplet.exists(pointName)) {
+                ggbApplet.deleteObject(pointName);
+            }
+        }
+
+        try {
+            ggbApplet.setVisible(link.childImage, progress >= 1);
+        } catch (e) {}
+    }
+}
+
+function startVoterOffspringAnimation() {
+
+    initialiseVoterOffspringAnimation();
+    ggbApplet.setValue("t", 0);
+
+    try {
+        ggbApplet.setAnimating("t", true);
+        ggbApplet.startAnimation();
+    } catch (e) {}
+}
+
+function resetVoterOffspringAnimation() {
+
+    try {
+        ggbApplet.setAnimating("t", false);
+    } catch (e) {}
+
+    ggbApplet.setValue("t", 0);
+
+    initialiseVoterOffspringAnimation();
+}`;
+
+    const blenderCode = "";
+
+    const buttonInstructions =
+`GeoGebra setup
+
+1. Insert the Red voter PNG and duplicate it to create:
+   RedParent1
+   RedParent2
+   RedParent3
+   RedChild1
+   RedChild2
+   RedChild3
+
+2. Insert the Blue voter PNG and duplicate it to create:
+   BlueParent1
+   BlueParent2
+   BlueParent3
+   BlueChild1
+   BlueChild2
+   BlueChild3
+
+3. Arrange the 12 images manually:
+   - 6 parent images in the top row
+   - 6 child images in the bottom row
+
+4. Create these anchor points manually:
+
+   BP2A  = point just below BlueParent2
+   BP3A  = point just below BlueParent3
+
+   BC1A  = point just above BlueChild1
+   BC2A  = point just above BlueChild2
+   BC3A  = point just above BlueChild3
+
+   RP2A  = point just below RedParent2
+   RP3A  = point just below RedParent3
+
+   RC1A  = point just above RedChild1
+   RC2A  = point just above RedChild2
+   RC3A  = point just above RedChild3
+
+   BlueParent1 and RedParent1 have no offspring in this example,
+   so they do not need parent anchor points.
+
+5. Create slider:
+   t
+
+   Minimum: 0
+   Maximum: 10
+   Increment: 0.05
+
+6. Slider t -> On Update JavaScript:
+
+   updateVoterOffspringAnimation();
+
+7. Create button:
+   Initialise
+
+   On Click JavaScript:
+
+   initialiseVoterOffspringAnimation();
+
+8. Create button:
+   Start
+
+   On Click JavaScript:
+
+   startVoterOffspringAnimation();
+
+9. Create button:
+   Reset
+
+   On Click JavaScript:
+
+   resetVoterOffspringAnimation();
+
+10. Optional:
+    After positioning, hide the anchor-point labels and/or points
+    if you want a cleaner final video view.`;
+
+    setOutputs(commands, code, blenderCode, buttonInstructions);
+}
+
+function generateGeoGebraGWPopulationDemo() {
+
+    const commands =
+`// Galton-Watson Population Demo
+// Uses GeoGebra Global JavaScript.
+//
+// Paste the generated JavaScript into GeoGebra's
+// Global JavaScript section.
+//
+// Then create the buttons described in the
+// GeoGebra Button Setup panel.`;
+
+    const code =
+`// --------------------------------------------------
+// Galton-Watson Population Demo
+// Single neutral population
+// Poisson offspring distribution
+// --------------------------------------------------
+
+var GWP_initialPopulation = 6;
+var GWP_lambda = 1.0;
+var GWP_generations = 8;
+var GWP_maxPopulation = 120;
+
+var GWP_generationGap = 3.0;
+var GWP_horizontalGap = 1.2;
+
+var GWP_objects = [];
+var GWP_populationHistory = [];
+
+
+// --------------------------------------------------
+// Poisson random variable
+// --------------------------------------------------
+
+function GWP_poisson(mean) {
+
+    var L = Math.exp(-mean);
+    var k = 0;
+    var p = 1;
+
+    do {
+        k++;
+        p *= Math.random();
+    } while (p > L);
+
+    return k - 1;
+}
+
+
+// --------------------------------------------------
+// Utility functions
+// --------------------------------------------------
+
+function GWP_hideLabel(name) {
+    try {
+        ggbApplet.setLabelVisible(name, false);
+    } catch (e) {}
+}
+
+
+function GWP_register(name) {
+    GWP_objects.push(name);
+}
+
+
+function clearGWPopulation() {
+
+    for (var i = 0; i < GWP_objects.length; i++) {
+
+        try {
+            if (ggbApplet.exists(GWP_objects[i])) {
+                ggbApplet.deleteObject(GWP_objects[i]);
+            }
+        } catch (e) {}
+    }
+
+    GWP_objects = [];
+    GWP_populationHistory = [];
+
+    var textNames = [
+        "GWPTitle",
+        "GWPSummary1",
+        "GWPSummary2",
+        "GWPSummary3",
+        "GWPSummary4"
+    ];
+
+    for (var j = 0; j < textNames.length; j++) {
+        try {
+            if (ggbApplet.exists(textNames[j])) {
+                ggbApplet.deleteObject(textNames[j]);
+            }
+        } catch (e) {}
+    }
+}
+
+
+// --------------------------------------------------
+// Draw one individual
+// --------------------------------------------------
+
+function GWP_drawIndividual(name, x, y) {
+
+    ggbApplet.evalCommand(
+        name + " = Circle((" +
+        x.toFixed(4) + "," +
+        y.toFixed(4) +
+        "),0.28)"
+    );
+
+    try {
+        ggbApplet.setColor(name, 70, 110, 180);
+        ggbApplet.setFilling(name, 0.65);
+        ggbApplet.setLineThickness(name, 2);
+    } catch (e) {}
+
+    GWP_hideLabel(name);
+    GWP_register(name);
+}
+
+
+// --------------------------------------------------
+// Draw parent-offspring connection
+// --------------------------------------------------
+
+function GWP_drawBranch(name, x1, y1, x2, y2) {
+
+    ggbApplet.evalCommand(
+        name + " = Segment((" +
+        x1.toFixed(4) + "," +
+        y1.toFixed(4) + "),(" +
+        x2.toFixed(4) + "," +
+        y2.toFixed(4) + "))"
+    );
+
+    try {
+        ggbApplet.setColor(name, 150, 150, 150);
+        ggbApplet.setLineThickness(name, 2);
+    } catch (e) {}
+
+    GWP_hideLabel(name);
+    GWP_register(name);
+}
+
+
+// --------------------------------------------------
+// Build Galton-Watson population
+// --------------------------------------------------
+
+function buildGWPopulation() {
+
+    clearGWPopulation();
+
+    var population = GWP_initialPopulation;
+
+    var current = [];
+
+    GWP_populationHistory.push(population);
+
+
+    // ----------------------------------------------
+    // Generation 0
+    // ----------------------------------------------
+
+    var startWidth =
+        (population - 1) * GWP_horizontalGap;
+
+    for (var i = 0; i < population; i++) {
+
+        var x =
+            i * GWP_horizontalGap -
+            startWidth / 2;
+
+        var y = 0;
+
+        var name = "GWPInd_0_" + i;
+
+        GWP_drawIndividual(name, x, y);
+
+        current.push({
+            x: x,
+            y: y
+        });
+    }
+
+
+    // ----------------------------------------------
+    // Later generations
+    // ----------------------------------------------
+
+    for (var generation = 1;
+         generation <= GWP_generations;
+         generation++) {
+
+        var offspringRecords = [];
+
+        for (var parentIndex = 0;
+             parentIndex < current.length;
+             parentIndex++) {
+
+            var parent = current[parentIndex];
+
+            var offspringCount =
+                GWP_poisson(GWP_lambda);
+
+            for (var child = 0;
+                 child < offspringCount;
+                 child++) {
+
+                offspringRecords.push({
+                    parentX: parent.x,
+                    parentY: parent.y
+                });
+
+                if (offspringRecords.length >=
+                    GWP_maxPopulation) {
+                    break;
+                }
+            }
+
+            if (offspringRecords.length >=
+                GWP_maxPopulation) {
+                break;
+            }
+        }
+
+
+        var nextPopulation =
+            offspringRecords.length;
+
+        GWP_populationHistory.push(nextPopulation);
+
+
+        if (nextPopulation === 0) {
+            break;
+        }
+
+
+        var rowWidth =
+            (nextPopulation - 1) *
+            GWP_horizontalGap;
+
+        var next = [];
+
+        for (var j = 0;
+             j < nextPopulation;
+             j++) {
+
+            var childX =
+                j * GWP_horizontalGap -
+                rowWidth / 2;
+
+            var childY =
+                -generation *
+                GWP_generationGap;
+
+            var childName =
+                "GWPInd_" +
+                generation +
+                "_" + j;
+
+            var branchName =
+                "GWPBranch_" +
+                generation +
+                "_" + j;
+
+            GWP_drawBranch(
+                branchName,
+                offspringRecords[j].parentX,
+                offspringRecords[j].parentY,
+                childX,
+                childY
+            );
+
+            GWP_drawIndividual(
+                childName,
+                childX,
+                childY
+            );
+
+            next.push({
+                x: childX,
+                y: childY
+            });
+        }
+
+        current = next;
+
+
+        if (current.length >=
+            GWP_maxPopulation) {
+            break;
+        }
+    }
+
+
+    GWP_drawSummary();
+    GWP_drawPopulationPlot();
+}
+
+
+// --------------------------------------------------
+// Population history plot
+// --------------------------------------------------
+
+function GWP_drawPopulationPlot() {
+
+    var n =
+        GWP_populationHistory.length;
+
+    if (n < 2) return;
+
+
+    var maxPop = 1;
+
+    for (var i = 0; i < n; i++) {
+
+        if (GWP_populationHistory[i] >
+            maxPop) {
+
+            maxPop =
+                GWP_populationHistory[i];
+        }
+    }
+
+
+    var plotX = 10;
+    var plotY = 0;
+    var plotWidth = 8;
+    var plotHeight = 6;
+
+
+    for (var j = 0; j < n - 1; j++) {
+
+        var x1 =
+            plotX +
+            (j / (n - 1)) *
+            plotWidth;
+
+        var x2 =
+            plotX +
+            ((j + 1) / (n - 1)) *
+            plotWidth;
+
+        var y1 =
+            plotY +
+            (GWP_populationHistory[j] /
+             maxPop) *
+            plotHeight;
+
+        var y2 =
+            plotY +
+            (GWP_populationHistory[j + 1] /
+             maxPop) *
+            plotHeight;
+
+        var name =
+            "GWPPopPlot_" + j;
+
+        ggbApplet.evalCommand(
+            name +
+            " = Segment((" +
+            x1.toFixed(4) + "," +
+            y1.toFixed(4) + "),(" +
+            x2.toFixed(4) + "," +
+            y2.toFixed(4) + "))"
+        );
+
+        try {
+            ggbApplet.setColor(
+                name,
+                70, 110, 180
+            );
+
+            ggbApplet.setLineThickness(
+                name,
+                3
+            );
+        } catch (e) {}
+
+        GWP_hideLabel(name);
+        GWP_register(name);
+    }
+
+
+    ggbApplet.evalCommand(
+        'GWPTitle = Text("Population size through generations",(10,7.6))'
+    );
+
+    GWP_hideLabel("GWPTitle");
+}
+
+
+// --------------------------------------------------
+// Summary text
+// --------------------------------------------------
+
+function GWP_drawSummary() {
+
+    var lastGeneration =
+        GWP_populationHistory.length - 1;
+
+    var finalPopulation =
+        GWP_populationHistory[
+            lastGeneration
+        ];
+
+    var outcome =
+        finalPopulation === 0
+        ? "Extinct"
+        : "Survived";
+
+
+    ggbApplet.evalCommand(
+        'GWPSummary1 = Text("Initial population = ' +
+        GWP_initialPopulation +
+        '",(10,-3.0))'
+    );
+
+    ggbApplet.evalCommand(
+        'GWPSummary2 = Text("Mean offspring lambda = ' +
+        GWP_lambda.toFixed(2) +
+        '",(10,-4.5))'
+    );
+
+    ggbApplet.evalCommand(
+        'GWPSummary3 = Text("Final generation = ' +
+        lastGeneration +
+        '   Final population = ' +
+        finalPopulation +
+        '",(10,-6.0))'
+    );
+
+    ggbApplet.evalCommand(
+        'GWPSummary4 = Text("Outcome: ' +
+        outcome +
+        '",(10,-8.0))'
+    );
+
+    GWP_hideLabel("GWPSummary1");
+    GWP_hideLabel("GWPSummary2");
+    GWP_hideLabel("GWPSummary3");
+    GWP_hideLabel("GWPSummary4");
+}
+
+
+// --------------------------------------------------
+// Optional setters
+// --------------------------------------------------
+
+function setGWPSubcritical() {
+    GWP_lambda = 0.8;
+}
+
+function setGWPCritical() {
+    GWP_lambda = 1.0;
+}
+
+function setGWPSupercritical() {
+    GWP_lambda = 1.2;
+}
+`;
+
+    const blenderCode = "";
+
+    const buttonInstructions =
+`GeoGebra setup
+
+Paste the generated code into:
+
+Settings
+→ Scripting
+→ Global JavaScript
+
+
+Create button:
+
+Build population
+
+On Click JavaScript:
+
+buildGWPopulation();
+
+
+Create button:
+
+Clear
+
+On Click JavaScript:
+
+clearGWPopulation();
+
+
+Optional demonstration buttons:
+
+Subcritical λ = 0.8
+
+setGWPSubcritical();
+buildGWPopulation();
+
+
+Critical λ = 1.0
+
+setGWPCritical();
+buildGWPopulation();
+
+
+Supercritical λ = 1.2
+
+setGWPSupercritical();
+buildGWPopulation();
+
+
+Default parameters inside the Global JavaScript are:
+
+Initial population:
+GWP_initialPopulation = 6
+
+Mean offspring:
+GWP_lambda = 1.0
+
+Generations:
+GWP_generations = 8
+
+Maximum population:
+GWP_maxPopulation = 120
+`;
+
+    setOutputs(
+        commands,
+        code,
+        blenderCode,
+        buttonInstructions
+    );
+}
+
+function generateGeoGebraGWAlleleDrift() {
+
+    const commands =
+`// Genetic Drift: Galton-Watson Alleles
+// Two neutral allele types: Red and Blue
+//
+// Offspring distribution may be:
+//   Poisson
+//   Negative binomial
+//
+// Paste the generated Global JavaScript into GeoGebra.
+// Then create the buttons listed in GeoGebra Button Setup.`;
+
+    const code =
+`// --------------------------------------------------
+// Genetic Drift: Galton-Watson Alleles
+// Poisson or Negative-Binomial Offspring
+// --------------------------------------------------
+
+
+// ==================================================
+// MODEL PARAMETERS
+// ==================================================
+
+var GWAD_m0 = 40;
+var GWAD_x0 = 0.50;
+
+var GWAD_offspringModel = "negativeBinomial";
+
+var GWAD_lambda = 1.04;
+var GWAD_sigma2 = 2.00;
+
+var GWAD_generations = 40;
+var GWAD_maxPopulation = 5000;
+
+
+// ==================================================
+// HISTORY ARRAYS
+// ==================================================
+
+var GWAD_redHistory = [];
+var GWAD_blueHistory = [];
+var GWAD_totalHistory = [];
+var GWAD_freqHistory = [];
+
+
+// ==================================================
+// BASIC UTILITIES
+// ==================================================
+
+function GWAD_hideLabel(name) {
+
+    try {
+        ggbApplet.setLabelVisible(name, false);
+    } catch (e) {}
+}
+
+
+function GWAD_clear() {
+
+    for (var i = ggbApplet.getObjectNumber() - 1; i >= 0; i--) {
+
+        var name = ggbApplet.getObjectName(i);
+
+        if (name.indexOf("GWAD") === 0) {
+
+            try {
+                ggbApplet.deleteObject(name);
+            } catch (e) {}
+        }
+    }
+
+    GWAD_redHistory = [];
+    GWAD_blueHistory = [];
+    GWAD_totalHistory = [];
+    GWAD_freqHistory = [];
+}
+
+
+function GWAD_drawSegment(
+    name,
+    x1, y1,
+    x2, y2,
+    r, g, b,
+    thickness
+) {
+
+    ggbApplet.evalCommand(
+        name + " = Segment((" +
+        x1.toFixed(4) + "," +
+        y1.toFixed(4) + "),(" +
+        x2.toFixed(4) + "," +
+        y2.toFixed(4) + "))"
+    );
+
+    try {
+        ggbApplet.setColor(name, r, g, b);
+        ggbApplet.setLineThickness(
+            name,
+            thickness || 3
+        );
+    } catch (e) {}
+
+    GWAD_hideLabel(name);
+}
+
+
+// ==================================================
+// POISSON OFFSPRING
+// ==================================================
+
+function GWAD_poisson(mean) {
+
+    var L = Math.exp(-mean);
+    var k = 0;
+    var p = 1;
+
+    do {
+        k++;
+        p *= Math.random();
+    } while (p > L);
+
+    return k - 1;
+}
+
+
+// ==================================================
+// NORMAL RANDOM VARIABLE
+// Used by Gamma generator
+// ==================================================
+
+function GWAD_standardNormal() {
+
+    var u1 = Math.random();
+    var u2 = Math.random();
+
+    // Avoid log(0)
+    if (u1 <= 0) {
+        u1 = 0.0000001;
+    }
+
+    return (
+        Math.sqrt(-2 * Math.log(u1)) *
+        Math.cos(2 * Math.PI * u2)
+    );
+}
+
+
+// ==================================================
+// GAMMA RANDOM VARIABLE
+// Marsaglia-Tsang algorithm
+// ==================================================
+
+function GWAD_gamma(shape, scale) {
+
+    if (shape <= 0 || scale <= 0) {
+        return 0;
+    }
+
+
+    // For shape < 1
+    if (shape < 1) {
+
+        var u = Math.random();
+
+        if (u <= 0) {
+            u = 0.0000001;
+        }
+
+        return (
+            GWAD_gamma(shape + 1, scale) *
+            Math.pow(u, 1 / shape)
+        );
+    }
+
+
+    var d = shape - 1 / 3;
+    var c = 1 / Math.sqrt(9 * d);
+
+
+    while (true) {
+
+        var x = GWAD_standardNormal();
+
+        var v = 1 + c * x;
+
+        if (v <= 0) {
+            continue;
+        }
+
+        v = v * v * v;
+
+
+        var u2 = Math.random();
+
+        if (
+            u2 <
+            1 - 0.0331 *
+            x * x * x * x
+        ) {
+
+            return scale * d * v;
+        }
+
+
+        if (
+            Math.log(u2) <
+            0.5 * x * x +
+            d *
+            (
+                1 - v +
+                Math.log(v)
+            )
+        ) {
+
+            return scale * d * v;
+        }
+    }
+}
+
+
+// ==================================================
+// NEGATIVE-BINOMIAL OFFSPRING
+//
+// Implemented as Gamma-Poisson mixture.
+//
+// mean     = lambda
+// variance = sigma2
+// ==================================================
+
+function GWAD_negativeBinomial(
+    mean,
+    variance
+) {
+
+    if (variance <= mean) {
+
+        // Negative binomial requires
+        // variance > mean.
+        //
+        // Fall back to Poisson.
+        return GWAD_poisson(mean);
+    }
+
+
+    var shape =
+        (mean * mean) /
+        (variance - mean);
+
+
+    var scale =
+        (variance - mean) /
+        mean;
+
+
+    var randomMean =
+        GWAD_gamma(
+            shape,
+            scale
+        );
+
+
+    return GWAD_poisson(
+        randomMean
+    );
+}
+
+
+// ==================================================
+// SELECT OFFSPRING DISTRIBUTION
+// ==================================================
+
+function GWAD_offspring() {
+
+    if (
+        GWAD_offspringModel ===
+        "negativeBinomial"
+    ) {
+
+        return GWAD_negativeBinomial(
+            GWAD_lambda,
+            GWAD_sigma2
+        );
+    }
+
+
+    return GWAD_poisson(
+        GWAD_lambda
+    );
+}
+
+
+// ==================================================
+// MAIN SIMULATION
+// ==================================================
+
+function runGWAlleleDrift() {
+
+    GWAD_clear();
+
+
+    var red =
+        Math.round(
+            GWAD_m0 *
+            GWAD_x0
+        );
+
+
+    var blue =
+        GWAD_m0 - red;
+
+
+    GWAD_redHistory.push(red);
+
+    GWAD_blueHistory.push(blue);
+
+    GWAD_totalHistory.push(
+        red + blue
+    );
+
+
+    GWAD_freqHistory.push(
+        (red + blue) > 0
+        ? red / (red + blue)
+        : 0
+    );
+
+
+    // ----------------------------------------------
+    // Successive generations
+    // ----------------------------------------------
+
+    for (
+        var generation = 1;
+        generation <= GWAD_generations;
+        generation++
+    ) {
+
+        var nextRed = 0;
+        var nextBlue = 0;
+
+
+        // Red individuals reproduce independently
+        for (
+            var r = 0;
+            r < red;
+            r++
+        ) {
+
+            nextRed +=
+                GWAD_offspring();
+        }
+
+
+        // Blue individuals reproduce independently
+        for (
+            var b = 0;
+            b < blue;
+            b++
+        ) {
+
+            nextBlue +=
+                GWAD_offspring();
+        }
+
+
+        red = nextRed;
+        blue = nextBlue;
+
+
+        var total =
+            red + blue;
+
+
+        GWAD_redHistory.push(red);
+
+        GWAD_blueHistory.push(blue);
+
+        GWAD_totalHistory.push(total);
+
+
+        GWAD_freqHistory.push(
+            total > 0
+            ? red / total
+            : 0
+        );
+
+
+        // Entire population extinct
+        if (total === 0) {
+            break;
+        }
+
+
+        // Safety limit
+        if (
+            total >
+            GWAD_maxPopulation
+        ) {
+            break;
+        }
+    }
+
+
+    GWAD_drawFrequencyPlot();
+
+    GWAD_drawTotalPopulationPlot();
+
+    GWAD_drawCountPlot();
+
+    GWAD_drawSummary();
+}
+
+
+// ==================================================
+// GRAPH 1
+// RED ALLELE FREQUENCY
+// ==================================================
+
+function GWAD_drawFrequencyPlot() {
+
+    var n =
+        GWAD_freqHistory.length;
+
+
+    var baseY = 0;
+    var height = 6;
+
+
+    // Frequency path
+    for (
+        var i = 0;
+        i < n - 1;
+        i++
+    ) {
+
+        GWAD_drawSegment(
+            "GWADFreq" + i,
+
+            i,
+            baseY +
+            GWAD_freqHistory[i] *
+            height,
+
+            i + 1,
+            baseY +
+            GWAD_freqHistory[i + 1] *
+            height,
+
+            220, 40, 40,
+            3
+        );
+    }
+
+
+    // Title
+    ggbApplet.evalCommand(
+        'GWADFreqTitle = Text("Red allele frequency",(2.0,7.8))'
+    );
+
+
+    // Horizontal reference lines
+    ggbApplet.evalCommand(
+        'GWADFreqAxis0 = Segment((0,0),(' +
+        (n - 1).toFixed(4) +
+        ',0))'
+    );
+
+
+    ggbApplet.evalCommand(
+        'GWADFreqAxisHalf = Segment((0,3),(' +
+        (n - 1).toFixed(4) +
+        ',3))'
+    );
+
+
+    ggbApplet.evalCommand(
+        'GWADFreqAxis1 = Segment((0,6),(' +
+        (n - 1).toFixed(4) +
+        ',6))'
+    );
+
+
+    try {
+
+        ggbApplet.setColor(
+            "GWADFreqAxis0",
+            210, 210, 210
+        );
+
+        ggbApplet.setColor(
+            "GWADFreqAxisHalf",
+            225, 225, 225
+        );
+
+        ggbApplet.setColor(
+            "GWADFreqAxis1",
+            210, 210, 210
+        );
+
+
+        ggbApplet.setLineThickness(
+            "GWADFreqAxis0",
+            1
+        );
+
+        ggbApplet.setLineThickness(
+            "GWADFreqAxisHalf",
+            1
+        );
+
+        ggbApplet.setLineThickness(
+            "GWADFreqAxis1",
+            1
+        );
+
+    } catch (e) {}
+
+
+    // Frequency labels
+    ggbApplet.evalCommand(
+        'GWADFreqLabel0 = Text("0.0",(-2,0))'
+    );
+
+    ggbApplet.evalCommand(
+        'GWADFreqLabelHalf = Text("0.5",(-2,3))'
+    );
+
+    ggbApplet.evalCommand(
+        'GWADFreqLabel1 = Text("1.0",(-2,6))'
+    );
+
+
+    GWAD_hideLabel(
+        "GWADFreqTitle"
+    );
+
+    GWAD_hideLabel(
+        "GWADFreqAxis0"
+    );
+
+    GWAD_hideLabel(
+        "GWADFreqAxisHalf"
+    );
+
+    GWAD_hideLabel(
+        "GWADFreqAxis1"
+    );
+
+    GWAD_hideLabel(
+        "GWADFreqLabel0"
+    );
+
+    GWAD_hideLabel(
+        "GWADFreqLabelHalf"
+    );
+
+    GWAD_hideLabel(
+        "GWADFreqLabel1"
+    );
+}
+
+
+// ==================================================
+// GRAPH 2
+// TOTAL POPULATION SIZE
+// ==================================================
+
+function GWAD_drawTotalPopulationPlot() {
+
+    var n =
+        GWAD_totalHistory.length;
+
+
+    var baseY = -10;
+    var height = 6;
+
+
+    var maxPop = 1;
+
+
+    for (var i = 0; i < n; i++) {
+
+        if (
+            GWAD_totalHistory[i] >
+            maxPop
+        ) {
+
+            maxPop =
+                GWAD_totalHistory[i];
+        }
+    }
+
+
+    for (
+        var j = 0;
+        j < n - 1;
+        j++
+    ) {
+
+        var y1 =
+            baseY +
+            (
+                GWAD_totalHistory[j] /
+                maxPop
+            ) *
+            height;
+
+
+        var y2 =
+            baseY +
+            (
+                GWAD_totalHistory[j + 1] /
+                maxPop
+            ) *
+            height;
+
+
+        GWAD_drawSegment(
+            "GWADPop" + j,
+
+            j, y1,
+
+            j + 1, y2,
+
+            70, 110, 180,
+            3
+        );
+    }
+
+
+    ggbApplet.evalCommand(
+        'GWADPopTitle = Text("Total population size",(0,-3.2))'
+    );
+
+
+    GWAD_hideLabel(
+        "GWADPopTitle"
+    );
+}
+
+
+// ==================================================
+// GRAPH 3
+// RED AND BLUE COUNTS
+// ==================================================
+
+function GWAD_drawCountPlot() {
+
+    var n =
+        GWAD_totalHistory.length;
+
+
+    var baseY = -20;
+    var height = 6;
+
+
+    var maxCount = 1;
+
+
+    for (var i = 0; i < n; i++) {
+
+        if (
+            GWAD_redHistory[i] >
+            maxCount
+        ) {
+
+            maxCount =
+                GWAD_redHistory[i];
+        }
+
+
+        if (
+            GWAD_blueHistory[i] >
+            maxCount
+        ) {
+
+            maxCount =
+                GWAD_blueHistory[i];
+        }
+    }
+
+
+    for (
+        var j = 0;
+        j < n - 1;
+        j++
+    ) {
+
+        var redY1 =
+            baseY +
+            (
+                GWAD_redHistory[j] /
+                maxCount
+            ) *
+            height;
+
+
+        var redY2 =
+            baseY +
+            (
+                GWAD_redHistory[j + 1] /
+                maxCount
+            ) *
+            height;
+
+
+        var blueY1 =
+            baseY +
+            (
+                GWAD_blueHistory[j] /
+                maxCount
+            ) *
+            height;
+
+
+        var blueY2 =
+            baseY +
+            (
+                GWAD_blueHistory[j + 1] /
+                maxCount
+            ) *
+            height;
+
+
+        GWAD_drawSegment(
+            "GWADRedCount" + j,
+
+            j, redY1,
+
+            j + 1, redY2,
+
+            220, 40, 40,
+            3
+        );
+
+
+        GWAD_drawSegment(
+            "GWADBlueCount" + j,
+
+            j, blueY1,
+
+            j + 1, blueY2,
+
+            40, 90, 220,
+            3
+        );
+    }
+
+
+    ggbApplet.evalCommand(
+        'GWADCountTitle = Text("Red and Blue counts",(0,-13.2))'
+    );
+
+
+    GWAD_hideLabel(
+        "GWADCountTitle"
+    );
+}
+
+
+// ==================================================
+// SUMMARY
+// ==================================================
+
+function GWAD_drawSummary() {
+
+    var last =
+        GWAD_totalHistory.length - 1;
+
+
+    var red =
+        GWAD_redHistory[last];
+
+
+    var blue =
+        GWAD_blueHistory[last];
+
+
+    var total =
+        GWAD_totalHistory[last];
+
+
+    // ----------------------------------------------
+    // Actual variance used
+    // ----------------------------------------------
+
+    var sigma2;
+
+
+    if (
+        GWAD_offspringModel ===
+        "poisson"
+    ) {
+
+        sigma2 =
+            GWAD_lambda;
+
+    } else {
+
+        sigma2 =
+            GWAD_sigma2;
+    }
+
+
+    // ----------------------------------------------
+    // kappa0
+    // ----------------------------------------------
+
+    var kappa0 =
+        (
+            2 *
+            GWAD_m0 *
+            Math.log(
+                GWAD_lambda
+            )
+        ) /
+        sigma2;
+
+
+    // ----------------------------------------------
+    // Outcome
+    // ----------------------------------------------
+
+    var outcome = "";
+
+
+    if (total === 0) {
+
+        outcome =
+            "Whole population extinct";
+
+    } else if (red === 0) {
+
+        outcome =
+            "Blue fixed";
+
+    } else if (blue === 0) {
+
+        outcome =
+            "Red fixed";
+
+    } else {
+
+        outcome =
+            "Both alleles present";
+    }
+
+
+    // ----------------------------------------------
+    // Model label
+    // ----------------------------------------------
+
+    var modelText =
+        GWAD_offspringModel ===
+        "poisson"
+        ? "Poisson"
+        : "Negative binomial";
+
+
+    // ----------------------------------------------
+    // Summary placement
+    // ----------------------------------------------
+
+    var xText =
+        GWAD_generations + 3;
+
+
+    ggbApplet.evalCommand(
+        'GWADText1 = Text("Offspring model = ' +
+        modelText +
+        '",(' +
+        xText.toFixed(2) +
+        ',-3.2))'
+    );
+
+
+    ggbApplet.evalCommand(
+        'GWADText2 = Text("Initial population = ' +
+        GWAD_m0 +
+        '   Initial Red frequency = ' +
+        GWAD_x0.toFixed(3) +
+        '",(' +
+        xText.toFixed(2) +
+        ',-8.3))'
+    );
+
+
+    ggbApplet.evalCommand(
+        'GWADText3 = Text("lambda = ' +
+        GWAD_lambda.toFixed(3) +
+        '   sigma2 = ' +
+        sigma2.toFixed(3) +
+        '",(' +
+        xText.toFixed(2) +
+        ',-6.0))'
+    );
+
+
+    ggbApplet.evalCommand(
+        'GWADText4 = Text("kappa0 = ' +
+        kappa0.toFixed(3) +
+        '   Final generation = ' +
+        last +
+        '",(' +
+        xText.toFixed(2) +
+        ',-10.5))'
+    );
+
+
+    ggbApplet.evalCommand(
+        'GWADText5 = Text("Final Red = ' +
+        red +
+        '   Final Blue = ' +
+        blue +
+        '   Final total = ' +
+        total +
+        '",(' +
+        xText.toFixed(2) +
+        ',-12.6))'
+    );
+
+
+    ggbApplet.evalCommand(
+        'GWADText6 = Text("Outcome: ' +
+        outcome +
+        '",(' +
+        xText.toFixed(2) +
+        ',-14.7))'
+    );
+
+
+    GWAD_hideLabel("GWADText1");
+    GWAD_hideLabel("GWADText2");
+    GWAD_hideLabel("GWADText3");
+    GWAD_hideLabel("GWADText4");
+    GWAD_hideLabel("GWADText5");
+    GWAD_hideLabel("GWADText6");
+}
+
+
+// ==================================================
+// MODEL-SELECTION FUNCTIONS
+// ==================================================
+
+function setGWADPoisson() {
+
+    GWAD_offspringModel =
+        "poisson";
+
+    GWAD_lambda = 1.04;
+
+    // Poisson variance automatically
+    // equals lambda.
+}
+
+
+function setGWADNegativeBinomial() {
+
+    GWAD_offspringModel =
+        "negativeBinomial";
+
+    GWAD_lambda = 1.04;
+
+    GWAD_sigma2 = 2.00;
+}
+
+
+// ==================================================
+// END
+// ==================================================
+`;
+
+    const blenderCode = "";
+
+    const buttonInstructions =
+`GeoGebra setup
+
+Paste the generated code into:
+
+Settings
+→ Scripting
+→ Global JavaScript
+
+
+--------------------------------
+Button 1
+--------------------------------
+
+Caption:
+
+Poisson
+
+On Click JavaScript:
+
+setGWADPoisson();
+runGWAlleleDrift();
+
+
+--------------------------------
+Button 2
+--------------------------------
+
+Caption:
+
+Negative Binomial
+
+On Click JavaScript:
+
+setGWADNegativeBinomial();
+runGWAlleleDrift();
+
+
+--------------------------------
+Button 3
+--------------------------------
+
+Caption:
+
+Run Again
+
+On Click JavaScript:
+
+runGWAlleleDrift();
+
+
+--------------------------------
+Button 4
+--------------------------------
+
+Caption:
+
+Clear
+
+On Click JavaScript:
+
+GWAD_clear();
+
+
+Default settings:
+
+Initial population m0 = 40
+
+Initial Red frequency = 0.50
+
+Mean offspring lambda = 1.04
+
+Negative-binomial variance sigma2 = 2.00
+
+Generations = 40
+
+
+For Poisson:
+
+sigma2 = lambda
+
+
+For Negative Binomial:
+
+lambda = 1.04
+sigma2 = 2.00
+`;
+
+    setOutputs(
+        commands,
+        code,
+        blenderCode,
+        buttonInstructions
+    );
+}
+
+function generateGeoGebraGWAlleleDriftComparison() {
+
+    const commands =
+`// Galton-Watson Allele Drift Comparison
+// Three kappa regimes, 8 replicate paths each.
+//
+// Paste the generated JavaScript into GeoGebra
+// Global JavaScript and create the button shown
+// in the Button Setup output.`;
+
+    const code =
+`// --------------------------------------------------
+// Galton-Watson Allele Drift: kappa comparison
+// 3 panels, 8 simulations per panel
+// --------------------------------------------------
+
+var GWKC_runs = 8;
+var GWKC_generations = 40;
+var GWKC_x0 = 0.50;
+var GWKC_maxPopulation = 10000;
+
+
+// --------------------------------------------------
+// Three comparison regimes
+// --------------------------------------------------
+
+var GWKC_regimes = [
+
+    {
+        name: "Small kappa",
+        m0: 20,
+        lambda: 1.01,
+        xOffset: 0,
+        yOffset: 0
+    },
+
+    {
+        name: "Transition kappa",
+        m0: 40,
+        lambda: 1.02,
+        xOffset: 0,
+        yOffset: -18
+    },
+
+    {
+        name: "Large kappa",
+        m0: 200,
+        lambda: 1.02,
+        xOffset: 0,
+        yOffset: -36
+    }
+];
+
+
+// --------------------------------------------------
+// Poisson offspring
+// --------------------------------------------------
+
+function GWKC_poisson(mean) {
+
+    var L = Math.exp(-mean);
+    var k = 0;
+    var p = 1;
+
+    do {
+        k++;
+        p *= Math.random();
+    } while (p > L);
+
+    return k - 1;
+}
+
+
+// --------------------------------------------------
+// Utilities
+// --------------------------------------------------
+
+function GWKC_hideLabel(name) {
+
+    try {
+        ggbApplet.setLabelVisible(name, false);
+    } catch (e) {}
+}
+
+
+function GWKC_clear() {
+
+    for (var i = ggbApplet.getObjectNumber() - 1; i >= 0; i--) {
+
+        var name = ggbApplet.getObjectName(i);
+
+        if (name.indexOf("GWKC") === 0) {
+
+            try {
+                ggbApplet.deleteObject(name);
+            } catch (e) {}
+        }
+    }
+}
+
+
+function GWKC_drawSegment(
+    name,
+    x1, y1,
+    x2, y2,
+    r, g, b,
+    thickness
+) {
+
+    ggbApplet.evalCommand(
+        name + " = Segment((" +
+        x1.toFixed(4) + "," +
+        y1.toFixed(4) + "),(" +
+        x2.toFixed(4) + "," +
+        y2.toFixed(4) + "))"
+    );
+
+    try {
+        ggbApplet.setColor(name, r, g, b);
+        ggbApplet.setLineThickness(name, thickness);
+    } catch (e) {}
+
+    GWKC_hideLabel(name);
+}
+
+
+// --------------------------------------------------
+// Simulate one Red/Blue GW population
+// --------------------------------------------------
+
+function GWKC_simulate(m0, lambda) {
+
+    var red = Math.round(m0 * GWKC_x0);
+    var blue = m0 - red;
+
+    var frequency = [
+        red / (red + blue)
+    ];
+
+    var wholeExtinct = false;
+
+    for (var generation = 1;
+         generation <= GWKC_generations;
+         generation++) {
+
+        var nextRed = 0;
+        var nextBlue = 0;
+
+        for (var r = 0; r < red; r++) {
+            nextRed += GWKC_poisson(lambda);
+        }
+
+        for (var b = 0; b < blue; b++) {
+            nextBlue += GWKC_poisson(lambda);
+        }
+
+        red = nextRed;
+        blue = nextBlue;
+
+        var total = red + blue;
+
+        if (total === 0) {
+
+            wholeExtinct = true;
+
+            frequency.push(
+                frequency[frequency.length - 1]
+            );
+
+            break;
+        }
+
+        frequency.push(red / total);
+
+        if (total > GWKC_maxPopulation) {
+            break;
+        }
+    }
+
+    while (frequency.length <
+           GWKC_generations + 1) {
+
+        frequency.push(
+            frequency[frequency.length - 1]
+        );
+    }
+
+    var outcome = "";
+
+    if (wholeExtinct) {
+        outcome = "populationExtinct";
+    } else if (red === 0) {
+        outcome = "blueFixed";
+    } else if (blue === 0) {
+        outcome = "redFixed";
+    } else {
+        outcome = "both";
+    }
+
+    return {
+        frequency: frequency,
+        outcome: outcome
+    };
+}
+
+
+// --------------------------------------------------
+// Draw one panel
+// --------------------------------------------------
+
+function GWKC_drawPanel(regime, regimeIndex) {
+
+    var panelX = regime.xOffset;
+    var panelY = regime.yOffset;
+
+    var plotWidth = 55;
+    var plotHeight = 8;
+
+    var sigma2 = regime.lambda;
+
+    var kappa =
+        (2 * regime.m0 *
+         Math.log(regime.lambda)) /
+        sigma2;
+
+
+    // ----------------------------------------------
+    // Panel title
+    // ----------------------------------------------
+
+    ggbApplet.evalCommand(
+        'GWKCTitle' + regimeIndex +
+        ' = Text("' +
+        regime.name +
+        '",( ' +
+        panelX.toFixed(2) +
+        ',' + (panelY + 10.2).toFixed(2) + '))'
+    );
+
+    ggbApplet.evalCommand(
+        'GWKCKappa' + regimeIndex +
+        ' = Text("kappa0 = ' +
+        kappa.toFixed(3) +
+        '   m0 = ' +
+        regime.m0 +
+        '   lambda = ' +
+        regime.lambda.toFixed(2) +
+        '",( ' +
+        panelX.toFixed(2) +
+        ',' + (panelY + 9.2).toFixed(2) + '))'
+    );
+
+    GWKC_hideLabel("GWKCTitle" + regimeIndex);
+    GWKC_hideLabel("GWKCKappa" + regimeIndex);
+
+
+    // ----------------------------------------------
+    // Reference lines: 0, 0.5, 1
+    // ----------------------------------------------
+
+    var levels = [0, 0.5, 1];
+
+    for (var q = 0; q < levels.length; q++) {
+
+        var yy =
+            panelY +
+            levels[q] * plotHeight;
+
+        GWKC_drawSegment(
+            "GWKCRef_" +
+            regimeIndex + "_" + q,
+
+            panelX,
+            yy,
+
+            panelX + plotWidth,
+            yy,
+
+            210, 210, 210,
+            1
+        );
+    }
+
+
+    // ----------------------------------------------
+    // Frequency labels
+    // ----------------------------------------------
+
+    ggbApplet.evalCommand(
+    'GWKCLabel0_' + regimeIndex +
+    ' = Text("0.0",(' +
+    (panelX - 3).toFixed(2) + ',' +
+    panelY.toFixed(2) + '))'
+    );
+
+ggbApplet.evalCommand(
+    'GWKCLabelHalf_' + regimeIndex +
+    ' = Text("0.5",(' +
+    (panelX - 3).toFixed(2) + ',' +
+    (panelY + 4).toFixed(2) + '))'
+);
+
+ggbApplet.evalCommand(
+    'GWKCLabel1_' + regimeIndex +
+    ' = Text("1.0",(' +
+    (panelX - 3).toFixed(2) + ',' +
+    (panelY + 8).toFixed(2) + '))'
+);
+
+    GWKC_hideLabel(
+        "GWKCLabel0_" + regimeIndex
+    );
+
+    GWKC_hideLabel(
+        "GWKCLabelHalf_" + regimeIndex
+    );
+
+    GWKC_hideLabel(
+        "GWKCLabel1_" + regimeIndex
+    );
+
+
+    // ----------------------------------------------
+    // Outcome counters
+    // ----------------------------------------------
+
+    var redFixed = 0;
+    var blueFixed = 0;
+    var both = 0;
+    var extinct = 0;
+
+
+    // ----------------------------------------------
+    // Eight replicate paths
+    // ----------------------------------------------
+
+    for (var run = 0;
+         run < GWKC_runs;
+         run++) {
+
+        var result =
+            GWKC_simulate(
+                regime.m0,
+                regime.lambda
+            );
+
+        if (result.outcome === "redFixed") {
+            redFixed++;
+        } else if (
+            result.outcome === "blueFixed"
+        ) {
+            blueFixed++;
+        } else if (
+            result.outcome ===
+            "populationExtinct"
+        ) {
+            extinct++;
+        } else {
+            both++;
+        }
+
+
+        for (var g = 0;
+             g < GWKC_generations;
+             g++) {
+
+            var x1 =
+                panelX +
+                (g /
+                 GWKC_generations) *
+                plotWidth;
+
+            var x2 =
+                panelX +
+                ((g + 1) /
+                 GWKC_generations) *
+                plotWidth;
+
+            var y1 =
+                panelY +
+                result.frequency[g] *
+                plotHeight;
+
+            var y2 =
+                panelY +
+                result.frequency[g + 1] *
+                plotHeight;
+
+
+            GWKC_drawSegment(
+                "GWKCPath_" +
+                regimeIndex +
+                "_" + run +
+                "_" + g,
+
+                x1, y1,
+                x2, y2,
+
+                220, 90, 90,
+                2
+            );
+        }
+    }
+
+
+    // ----------------------------------------------
+    // Outcome summary
+    // ----------------------------------------------
+
+    ggbApplet.evalCommand(
+    'GWKCStats1_' + regimeIndex +
+    ' = Text("Red fixed: ' +
+    redFixed +
+    '",(' +
+    panelX.toFixed(2) + ',' +
+    (panelY - 2.0).toFixed(2) + '))'
+);
+
+ggbApplet.evalCommand(
+    'GWKCStats2_' + regimeIndex +
+    ' = Text("Blue fixed: ' +
+    blueFixed +
+    '",(' +
+    panelX.toFixed(2) + ',' +
+    (panelY - 3.1).toFixed(2) + '))'
+);
+
+ggbApplet.evalCommand(
+    'GWKCStats3_' + regimeIndex +
+    ' = Text("Both present: ' +
+    both +
+    '",(' +
+    panelX.toFixed(2) + ',' +
+    (panelY - 4.2).toFixed(2) + '))'
+);
+
+ggbApplet.evalCommand(
+    'GWKCStats4_' + regimeIndex +
+    ' = Text("Population extinct: ' +
+    extinct +
+    '",(' +
+    panelX.toFixed(2) + ',' +
+    (panelY - 5.3).toFixed(2) + '))'
+);
+    GWKC_hideLabel(
+        "GWKCStats1_" + regimeIndex
+    );
+
+    GWKC_hideLabel(
+        "GWKCStats2_" + regimeIndex
+    );
+
+    GWKC_hideLabel(
+        "GWKCStats3_" + regimeIndex
+    );
+
+    GWKC_hideLabel(
+        "GWKCStats4_" + regimeIndex
+    );
+}
+
+
+// --------------------------------------------------
+// Main comparison
+// --------------------------------------------------
+
+function runGWKappaComparison() {
+
+    GWKC_clear();
+
+    for (var i = 0;
+         i < GWKC_regimes.length;
+         i++) {
+
+        GWKC_drawPanel(
+            GWKC_regimes[i],
+            i
+        );
+    }
+}
+`;
+
+    const blenderCode = "";
+
+    const buttonInstructions =
+`GeoGebra setup
+
+Paste the generated JavaScript into:
+
+Settings
+→ Scripting
+→ Global JavaScript
+
+
+Create button:
+
+Run kappa comparison
+
+On Click JavaScript:
+
+runGWKappaComparison();
+
+
+Create button:
+
+Run again
+
+On Click JavaScript:
+
+runGWKappaComparison();
+
+
+Create button:
+
+Clear
+
+On Click JavaScript:
+
+GWKC_clear();
+
+
+The comparison uses:
+
+8 replicate paths per panel
+40 generations
+Initial Red frequency = 0.50
+
+Small kappa:
+m0 = 20
+lambda = 1.01
+
+Transition kappa:
+m0 = 40
+lambda = 1.02
+
+Large kappa:
+m0 = 200
+lambda = 1.02
+`;
+
+    setOutputs(
+        commands,
+        code,
+        blenderCode,
+        buttonInstructions
+    );
+}
+
+function generateGeoGebraGWVarianceComparison() {
+
+    const commands =
+`// GW Allele Drift: Poisson vs Negative Binomial
+// Multi-run comparison with the same initial population
+// and same mean offspring number, but different variance.
+//
+// Paste the generated Global JavaScript into GeoGebra.
+// Then create the buttons listed in GeoGebra Button Setup.`;
+
+    const code =
+`// --------------------------------------------------
+// GW Allele Drift: Poisson vs Negative Binomial
+// Multi-run comparison
+// --------------------------------------------------
+
+
+// ==================================================
+// PARAMETERS
+// ==================================================
+
+var GWVC_runs = 8;
+var GWVC_generations = 40;
+var GWVC_m0 = 40;
+var GWVC_x0 = 0.50;
+var GWVC_lambda = 1.04;
+var GWVC_nbSigma2 = 2.00;
+var GWVC_maxPopulation = 5000;
+
+
+// ==================================================
+// PANEL DEFINITIONS
+// ==================================================
+
+var GWVC_panels = [
+
+    {
+        name: "Poisson offspring",
+        model: "poisson",
+        sigma2: GWVC_lambda,
+        xOffset: 0,
+        yOffset: 0
+    },
+
+    {
+        name: "Negative-binomial offspring",
+        model: "negativeBinomial",
+        sigma2: GWVC_nbSigma2,
+        xOffset: 0,
+        yOffset: -18
+    }
+];
+
+
+// ==================================================
+// UTILITIES
+// ==================================================
+
+function GWVC_hideLabel(name) {
+    try {
+        ggbApplet.setLabelVisible(name, false);
+    } catch (e) {}
+}
+
+
+function GWVC_clear() {
+
+    for (var i = ggbApplet.getObjectNumber() - 1; i >= 0; i--) {
+
+        var name = ggbApplet.getObjectName(i);
+
+        if (name.indexOf("GWVC") === 0) {
+            try {
+                ggbApplet.deleteObject(name);
+            } catch (e) {}
+        }
+    }
+}
+
+
+function GWVC_drawSegment(name, x1, y1, x2, y2, r, g, b, thickness) {
+
+    ggbApplet.evalCommand(
+        name + " = Segment((" +
+        x1.toFixed(4) + "," +
+        y1.toFixed(4) + "),(" +
+        x2.toFixed(4) + "," +
+        y2.toFixed(4) + "))"
+    );
+
+    try {
+        ggbApplet.setColor(name, r, g, b);
+        ggbApplet.setLineThickness(name, thickness);
+    } catch (e) {}
+
+    GWVC_hideLabel(name);
+}
+
+
+// ==================================================
+// RANDOM NUMBER GENERATORS
+// ==================================================
+
+function GWVC_poisson(mean) {
+
+    var L = Math.exp(-mean);
+    var k = 0;
+    var p = 1;
+
+    do {
+        k++;
+        p *= Math.random();
+    } while (p > L);
+
+    return k - 1;
+}
+
+
+function GWVC_standardNormal() {
+
+    var u1 = Math.random();
+    var u2 = Math.random();
+
+    if (u1 <= 0) {
+        u1 = 0.0000001;
+    }
+
+    return (
+        Math.sqrt(-2 * Math.log(u1)) *
+        Math.cos(2 * Math.PI * u2)
+    );
+}
+
+
+function GWVC_gamma(shape, scale) {
+
+    if (shape <= 0 || scale <= 0) {
+        return 0;
+    }
+
+    if (shape < 1) {
+
+        var u = Math.random();
+
+        if (u <= 0) {
+            u = 0.0000001;
+        }
+
+        return (
+            GWVC_gamma(shape + 1, scale) *
+            Math.pow(u, 1 / shape)
+        );
+    }
+
+    var d = shape - 1 / 3;
+    var c = 1 / Math.sqrt(9 * d);
+
+    while (true) {
+
+        var x = GWVC_standardNormal();
+        var v = 1 + c * x;
+
+        if (v <= 0) continue;
+
+        v = v * v * v;
+
+        var u2 = Math.random();
+
+        if (u2 < 1 - 0.0331 * x * x * x * x) {
+            return scale * d * v;
+        }
+
+        if (
+            Math.log(u2) <
+            0.5 * x * x +
+            d * (1 - v + Math.log(v))
+        ) {
+            return scale * d * v;
+        }
+    }
+}
+
+
+function GWVC_negativeBinomial(mean, variance) {
+
+    if (variance <= mean) {
+        return GWVC_poisson(mean);
+    }
+
+    var shape =
+        (mean * mean) /
+        (variance - mean);
+
+    var scale =
+        (variance - mean) /
+        mean;
+
+    var randomMean =
+        GWVC_gamma(shape, scale);
+
+    return GWVC_poisson(randomMean);
+}
+
+
+function GWVC_offspring(model, mean, variance) {
+
+    if (model === "negativeBinomial") {
+        return GWVC_negativeBinomial(mean, variance);
+    }
+
+    return GWVC_poisson(mean);
+}
+
+
+// ==================================================
+// SIMULATE ONE RED/BLUE GW RUN
+// ==================================================
+
+function GWVC_simulate(model, variance) {
+
+    var red =
+        Math.round(GWVC_m0 * GWVC_x0);
+
+    var blue =
+        GWVC_m0 - red;
+
+    var frequency = [
+        (red + blue) > 0 ? red / (red + blue) : 0
+    ];
+
+    var wholeExtinct = false;
+
+    for (var generation = 1;
+         generation <= GWVC_generations;
+         generation++) {
+
+        var nextRed = 0;
+        var nextBlue = 0;
+
+        for (var r = 0; r < red; r++) {
+            nextRed += GWVC_offspring(
+                model,
+                GWVC_lambda,
+                variance
+            );
+        }
+
+        for (var b = 0; b < blue; b++) {
+            nextBlue += GWVC_offspring(
+                model,
+                GWVC_lambda,
+                variance
+            );
+        }
+
+        red = nextRed;
+        blue = nextBlue;
+
+        var total = red + blue;
+
+        if (total === 0) {
+
+            wholeExtinct = true;
+
+            // Frequency is undefined after total extinction.
+            // For plotting, hold the last visible value.
+            frequency.push(
+                frequency[frequency.length - 1]
+            );
+
+            break;
+        }
+
+        frequency.push(red / total);
+
+        if (total > GWVC_maxPopulation) {
+            break;
+        }
+    }
+
+    while (frequency.length < GWVC_generations + 1) {
+        frequency.push(
+            frequency[frequency.length - 1]
+        );
+    }
+
+    var outcome = "";
+
+    if (wholeExtinct) {
+        outcome = "populationExtinct";
+    } else if (red === 0) {
+        outcome = "blueFixed";
+    } else if (blue === 0) {
+        outcome = "redFixed";
+    } else {
+        outcome = "both";
+    }
+
+    return {
+        frequency: frequency,
+        outcome: outcome,
+        finalRed: red,
+        finalBlue: blue
+    };
+}
+
+
+// ==================================================
+// DRAW ONE PANEL
+// ==================================================
+
+function GWVC_drawPanel(panel, panelIndex) {
+
+    var panelX = panel.xOffset;
+    var panelY = panel.yOffset;
+
+    var plotWidth = 52;
+    var plotHeight = 8;
+
+    var sigma2 = panel.sigma2;
+
+    var kappa0 =
+        (2 * GWVC_m0 * Math.log(GWVC_lambda)) /
+        sigma2;
+
+
+    // ----------------------------------------------
+    // Titles
+    // ----------------------------------------------
+
+    ggbApplet.evalCommand(
+        'GWVCTitle' + panelIndex +
+        ' = Text("' + panel.name + '",(' +
+        panelX.toFixed(2) + ',' +
+        (panelY + 10.3).toFixed(2) + '))'
+    );
+
+    ggbApplet.evalCommand(
+        'GWVCInfo1_' + panelIndex +
+        ' = Text("Initial population = ' +
+        GWVC_m0 +
+        '   Initial Red frequency = ' +
+        GWVC_x0.toFixed(3) +
+        '",(' +
+        panelX.toFixed(2) + ',' +
+        (panelY + 9.2).toFixed(2) + '))'
+    );
+
+    ggbApplet.evalCommand(
+        'GWVCInfo2_' + panelIndex +
+        ' = Text("lambda = ' +
+        GWVC_lambda.toFixed(3) +
+        '   sigma2 = ' +
+        sigma2.toFixed(3) +
+        '   kappa0 = ' +
+        kappa0.toFixed(3) +
+        '",(' +
+        panelX.toFixed(2) + ',' +
+        (panelY + 8.1).toFixed(2) + '))'
+    );
+
+    GWVC_hideLabel("GWVCTitle" + panelIndex);
+    GWVC_hideLabel("GWVCInfo1_" + panelIndex);
+    GWVC_hideLabel("GWVCInfo2_" + panelIndex);
+
+
+    // ----------------------------------------------
+    // Reference lines
+    // ----------------------------------------------
+
+    GWVC_drawSegment(
+        "GWVCRef0_" + panelIndex,
+        panelX,
+        panelY,
+        panelX + plotWidth,
+        panelY,
+        215, 215, 215,
+        1
+    );
+
+    GWVC_drawSegment(
+        "GWVCRefHalf_" + panelIndex,
+        panelX,
+        panelY + 4,
+        panelX + plotWidth,
+        panelY + 4,
+        225, 225, 225,
+        1
+    );
+
+    GWVC_drawSegment(
+        "GWVCRef1_" + panelIndex,
+        panelX,
+        panelY + 8,
+        panelX + plotWidth,
+        panelY + 8,
+        215, 215, 215,
+        1
+    );
+
+
+    // ----------------------------------------------
+    // Frequency labels
+    // ----------------------------------------------
+
+    ggbApplet.evalCommand(
+        'GWVCLabel0_' + panelIndex +
+        ' = Text("0.0",(' +
+        (panelX - 3.0).toFixed(2) + ',' +
+        panelY.toFixed(2) + '))'
+    );
+
+    ggbApplet.evalCommand(
+        'GWVCLabelHalf_' + panelIndex +
+        ' = Text("0.5",(' +
+        (panelX - 3.0).toFixed(2) + ',' +
+        (panelY + 4).toFixed(2) + '))'
+    );
+
+    ggbApplet.evalCommand(
+        'GWVCLabel1_' + panelIndex +
+        ' = Text("1.0",(' +
+        (panelX - 3.0).toFixed(2) + ',' +
+        (panelY + 8).toFixed(2) + '))'
+    );
+
+    GWVC_hideLabel("GWVCLabel0_" + panelIndex);
+    GWVC_hideLabel("GWVCLabelHalf_" + panelIndex);
+    GWVC_hideLabel("GWVCLabel1_" + panelIndex);
+
+
+    // ----------------------------------------------
+    // Outcome counters
+    // ----------------------------------------------
+
+    var redFixed = 0;
+    var blueFixed = 0;
+    var both = 0;
+    var extinct = 0;
+
+
+    // ----------------------------------------------
+    // Draw paths
+    // ----------------------------------------------
+
+    for (var run = 0; run < GWVC_runs; run++) {
+
+        var result =
+            GWVC_simulate(
+                panel.model,
+                panel.sigma2
+            );
+
+        if (result.outcome === "redFixed") {
+            redFixed++;
+        } else if (result.outcome === "blueFixed") {
+            blueFixed++;
+        } else if (result.outcome === "populationExtinct") {
+            extinct++;
+        } else {
+            both++;
+        }
+
+        for (var g = 0; g < GWVC_generations; g++) {
+
+            var x1 =
+                panelX +
+                (g / GWVC_generations) * plotWidth;
+
+            var x2 =
+                panelX +
+                ((g + 1) / GWVC_generations) * plotWidth;
+
+            var y1 =
+                panelY +
+                result.frequency[g] * plotHeight;
+
+            var y2 =
+                panelY +
+                result.frequency[g + 1] * plotHeight;
+
+            GWVC_drawSegment(
+                "GWVCPath_" +
+                panelIndex + "_" +
+                run + "_" + g,
+                x1, y1,
+                x2, y2,
+                220, 100, 100,
+                2
+            );
+        }
+    }
+
+
+    // ----------------------------------------------
+    // Statistics block
+    // ----------------------------------------------
+
+    ggbApplet.evalCommand(
+        'GWVCStats1_' + panelIndex +
+        ' = Text("Red fixed: ' +
+        redFixed +
+        '",(' +
+        panelX.toFixed(2) + ',' +
+        (panelY - 2.0).toFixed(2) + '))'
+    );
+
+    ggbApplet.evalCommand(
+        'GWVCStats2_' + panelIndex +
+        ' = Text("Blue fixed: ' +
+        blueFixed +
+        '",(' +
+        panelX.toFixed(2) + ',' +
+        (panelY - 3.1).toFixed(2) + '))'
+    );
+
+    ggbApplet.evalCommand(
+        'GWVCStats3_' + panelIndex +
+        ' = Text("Both present: ' +
+        both +
+        '",(' +
+        panelX.toFixed(2) + ',' +
+        (panelY - 4.2).toFixed(2) + '))'
+    );
+
+    ggbApplet.evalCommand(
+        'GWVCStats4_' + panelIndex +
+        ' = Text("Population extinct: ' +
+        extinct +
+        '",(' +
+        panelX.toFixed(2) + ',' +
+        (panelY - 5.3).toFixed(2) + '))'
+    );
+
+    GWVC_hideLabel("GWVCStats1_" + panelIndex);
+    GWVC_hideLabel("GWVCStats2_" + panelIndex);
+    GWVC_hideLabel("GWVCStats3_" + panelIndex);
+    GWVC_hideLabel("GWVCStats4_" + panelIndex);
+}
+
+
+// ==================================================
+// MAIN FUNCTION
+// ==================================================
+
+function runGWVarianceComparison() {
+
+    GWVC_clear();
+
+    for (var i = 0; i < GWVC_panels.length; i++) {
+        GWVC_drawPanel(
+            GWVC_panels[i],
+            i
+        );
+    }
+}
+
+
+// ==================================================
+// OPTIONAL PRESET FUNCTIONS
+// ==================================================
+
+function setGWVCExample1() {
+
+    GWVC_runs = 8;
+    GWVC_generations = 40;
+    GWVC_m0 = 40;
+    GWVC_x0 = 0.50;
+    GWVC_lambda = 1.04;
+    GWVC_nbSigma2 = 2.00;
+
+    GWVC_panels[0].sigma2 = GWVC_lambda;
+    GWVC_panels[1].sigma2 = GWVC_nbSigma2;
+}
+
+
+function setGWVCExample2() {
+
+    GWVC_runs = 8;
+    GWVC_generations = 40;
+    GWVC_m0 = 60;
+    GWVC_x0 = 0.50;
+    GWVC_lambda = 1.02;
+    GWVC_nbSigma2 = 2.50;
+
+    GWVC_panels[0].sigma2 = GWVC_lambda;
+    GWVC_panels[1].sigma2 = GWVC_nbSigma2;
+}
+`;
+
+    const blenderCode = "";
+
+    const buttonInstructions =
+`GeoGebra setup
+
+Paste the generated code into:
+
+Settings
+→ Scripting
+→ Global JavaScript
+
+
+--------------------------------
+Button 1
+--------------------------------
+
+Caption:
+
+Run comparison
+
+On Click JavaScript:
+
+runGWVarianceComparison();
+
+
+--------------------------------
+Button 2
+--------------------------------
+
+Caption:
+
+Run again
+
+On Click JavaScript:
+
+runGWVarianceComparison();
+
+
+--------------------------------
+Button 3
+--------------------------------
+
+Caption:
+
+Clear
+
+On Click JavaScript:
+
+GWVC_clear();
+
+
+--------------------------------
+Optional preset button
+--------------------------------
+
+Caption:
+
+Example 1
+
+On Click JavaScript:
+
+setGWVCExample1();
+runGWVarianceComparison();
+
+
+--------------------------------
+Optional preset button
+--------------------------------
+
+Caption:
+
+Example 2
+
+On Click JavaScript:
+
+setGWVCExample2();
+runGWVarianceComparison();
+
+
+Default settings:
+
+runs = 8
+generations = 40
+initial population = 40
+initial Red frequency = 0.50
+lambda = 1.04
+
+Poisson:
+sigma2 = lambda = 1.04
+
+Negative binomial:
+sigma2 = 2.00
+`;
+
+    setOutputs(
+        commands,
+        code,
+        blenderCode,
+        buttonInstructions
+    );
+}
+
+function generateGeoGebraOffspringDistributionComparison() {
+
+    const commands =
+`// Offspring Distribution Comparison
+// Poisson vs Negative Binomial
+//
+// Paste the generated JavaScript into GeoGebra's
+// Global JavaScript section.
+//
+// Then manually create the buttons listed below.`;
+
+    const code =
+`// --------------------------------------------------
+// Offspring Distribution Comparison
+// Poisson vs Negative Binomial
+// Same mean, different variance
+// --------------------------------------------------
+
+var ODC_lambda = 1.04;
+var ODC_sigma2 = 2.00;      // target variance for NB
+var ODC_samples = 1000;
+var ODC_maxK = 8;           // bins 0,1,...,7,8+
+var ODC_objects = [];
+
+
+// --------------------------------------------------
+// Utility
+// --------------------------------------------------
+
+function ODC_hideLabel(name) {
+    try {
+        ggbApplet.setLabelVisible(name, false);
+    } catch (e) {}
+}
+
+function ODC_register(name) {
+    ODC_objects.push(name);
+}
+
+function clearODC() {
+
+    for (var i = 0; i < ODC_objects.length; i++) {
+        try {
+            if (ggbApplet.exists(ODC_objects[i])) {
+                ggbApplet.deleteObject(ODC_objects[i]);
+            }
+        } catch (e) {}
+    }
+
+    ODC_objects = [];
+
+    for (var j = ggbApplet.getObjectNumber() - 1; j >= 0; j--) {
+        var name = ggbApplet.getObjectName(j);
+        if (name.indexOf("ODC") === 0) {
+            try {
+                ggbApplet.deleteObject(name);
+            } catch (e) {}
+        }
+    }
+}
+
+
+// --------------------------------------------------
+// Random generators
+// --------------------------------------------------
+
+function ODC_poisson(mean) {
+
+    var L = Math.exp(-mean);
+    var k = 0;
+    var p = 1;
+
+    do {
+        k++;
+        p *= Math.random();
+    } while (p > L);
+
+    return k - 1;
+}
+
+function ODC_standardNormal() {
+
+    var u1 = Math.random();
+    var u2 = Math.random();
+
+    return Math.sqrt(-2 * Math.log(u1)) *
+           Math.cos(2 * Math.PI * u2);
+}
+
+function ODC_gamma(shape, scale) {
+
+    if (shape < 1) {
+        var u = Math.random();
+        return ODC_gamma(shape + 1, scale) *
+               Math.pow(u, 1 / shape);
+    }
+
+    var d = shape - 1 / 3;
+    var c = 1 / Math.sqrt(9 * d);
+
+    while (true) {
+
+        var x = ODC_standardNormal();
+        var v = 1 + c * x;
+
+        if (v <= 0) continue;
+
+        v = v * v * v;
+        var u = Math.random();
+
+        if (u < 1 - 0.0331 * x * x * x * x) {
+            return scale * d * v;
+        }
+
+        if (
+            Math.log(u) <
+            0.5 * x * x +
+            d * (1 - v + Math.log(v))
+        ) {
+            return scale * d * v;
+        }
+    }
+}
+
+function ODC_negativeBinomial(mean, variance) {
+
+    if (variance <= mean) {
+        return ODC_poisson(mean);
+    }
+
+    var shape =
+        (mean * mean) /
+        (variance - mean);
+
+    var scale =
+        (variance - mean) /
+        mean;
+
+    var randomMean = ODC_gamma(shape, scale);
+
+    return ODC_poisson(randomMean);
+}
+
+
+// --------------------------------------------------
+// Simulation
+// --------------------------------------------------
+
+function ODC_simulate(modelName) {
+
+    var counts = [];
+
+    for (var i = 0; i <= ODC_maxK; i++) {
+        counts.push(0);
+    }
+
+    var sum = 0;
+    var sumSq = 0;
+
+    for (var s = 0; s < ODC_samples; s++) {
+
+        var x = 0;
+
+        if (modelName === "poisson") {
+            x = ODC_poisson(ODC_lambda);
+        } else {
+            x = ODC_negativeBinomial(
+                ODC_lambda,
+                ODC_sigma2
+            );
+        }
+
+        sum += x;
+        sumSq += x * x;
+
+        if (x >= ODC_maxK) {
+            counts[ODC_maxK]++;
+        } else {
+            counts[x]++;
+        }
+    }
+
+    var sampleMean = sum / ODC_samples;
+    var sampleVariance =
+        sumSq / ODC_samples - sampleMean * sampleMean;
+
+    return {
+        counts: counts,
+        sampleMean: sampleMean,
+        sampleVariance: sampleVariance
+    };
+}
+
+
+// --------------------------------------------------
+// Drawing helpers
+// --------------------------------------------------
+
+function ODC_drawBar(name, x1, x2, y1, y2, r, g, b) {
+
+    var xCentre = (x1 + x2) / 2;
+
+    ggbApplet.evalCommand(
+        name + " = Segment((" +
+        xCentre.toFixed(4) + "," +
+        y1.toFixed(4) + "),(" +
+        xCentre.toFixed(4) + "," +
+        y2.toFixed(4) + "))"
+    );
+
+    try {
+        ggbApplet.setColor(name, r, g, b);
+
+        // Thick line gives the appearance of a histogram bar
+        ggbApplet.setLineThickness(name, 12);
+
+    } catch (e) {}
+
+    ODC_hideLabel(name);
+    ODC_register(name);
+}
+
+function ODC_drawSegment(name, x1, y1, x2, y2, r, g, b, t) {
+
+    ggbApplet.evalCommand(
+        name + " = Segment((" +
+        x1.toFixed(4) + "," + y1.toFixed(4) + "),(" +
+        x2.toFixed(4) + "," + y2.toFixed(4) + "))"
+    );
+
+    try {
+        ggbApplet.setColor(name, r, g, b);
+        ggbApplet.setLineThickness(name, t);
+    } catch (e) {}
+
+    ODC_hideLabel(name);
+    ODC_register(name);
+}
+
+
+// --------------------------------------------------
+// Draw one histogram panel
+// --------------------------------------------------
+
+function ODC_drawPanel(panelName, result, panelX, panelY, title, r, g, b, targetVariance) {
+
+    var plotHeight = 6;
+    var barStep = 1.2;
+    var barWidth = 0.85;
+
+    var maxCount = 1;
+
+    for (var i = 0; i < result.counts.length; i++) {
+        if (result.counts[i] > maxCount) {
+            maxCount = result.counts[i];
+        }
+    }
+
+    // Title
+    ggbApplet.evalCommand(
+        panelName + 'Title = Text("' + title + '",(' +
+        panelX.toFixed(2) + ',' +
+        (panelY + 8.2).toFixed(2) + '))'
+    );
+    ODC_hideLabel(panelName + "Title");
+
+    // Subtitle
+    ggbApplet.evalCommand(
+        panelName + 'Info1 = Text("lambda = ' +
+        ODC_lambda.toFixed(2) +
+        '   target variance = ' +
+        targetVariance.toFixed(2) +
+        '",(' +
+        panelX.toFixed(2) + ',' +
+        (panelY + 7.3).toFixed(2) + '))'
+    );
+    ODC_hideLabel(panelName + "Info1");
+
+    ggbApplet.evalCommand(
+    panelName + 'Y1 = Text("Relative frequency",(' +
+    panelX.toFixed(2) + ',' +
+    (panelY + plotHeight + 0.4).toFixed(2) + '))'
+    );
+    ODC_hideLabel(panelName + "Info2");
+
+    // Axes
+    var plotWidth = barStep * (ODC_maxK + 1);
+
+    ODC_drawSegment(
+        panelName + "AxisX",
+        panelX,
+        panelY,
+        panelX + plotWidth,
+        panelY,
+        120, 120, 120, 1
+    );
+
+    ODC_drawSegment(
+        panelName + "AxisY",
+        panelX,
+        panelY,
+        panelX,
+        panelY + plotHeight,
+        120, 120, 120, 1
+    );
+
+    // Midline
+    ODC_drawSegment(
+        panelName + "MidLine",
+        panelX,
+        panelY + plotHeight / 2,
+        panelX + plotWidth,
+        panelY + plotHeight / 2,
+        220, 220, 220, 1
+    );
+
+    // Bars and labels
+    for (var k = 0; k <= ODC_maxK; k++) {
+
+        var xCenter = panelX + 0.8 + k * barStep;
+        var x1 = xCenter - barWidth / 2;
+        var x2 = xCenter + barWidth / 2;
+
+       var proportion =
+        result.counts[k] / ODC_samples;
+
+         var barHeight =
+             proportion * 20;
+
+        ODC_drawBar(
+            panelName + "Bar" + k,
+            x1, x2,
+            panelY,
+            panelY + barHeight,
+            r, g, b
+        );
+
+        var label = (k < ODC_maxK) ? String(k) : (ODC_maxK + "+");
+
+        ggbApplet.evalCommand(
+            panelName + "Label" + k +
+            ' = Text("' + label + '",(' +
+            (xCenter - 0.15).toFixed(2) + ',' +
+            (panelY - 0.9).toFixed(2) + '))'
+        );
+        ODC_hideLabel(panelName + "Label" + k);
+    }
+
+    // y annotations
+    ggbApplet.evalCommand(
+        panelName + 'Y0 = Text("0",(' +
+        (panelX - 0.8).toFixed(2) + ',' +
+        panelY.toFixed(2) + '))'
+    );
+    ODC_hideLabel(panelName + "Y0");
+
+    ggbApplet.evalCommand(
+        panelName + 'Y1 = Text("relative count",(' +
+        (panelX - 1.8).toFixed(2) + ',' +
+        (panelY + plotHeight + 0.2).toFixed(2) + '))'
+    );
+    ODC_hideLabel(panelName + "Y1");
+}
+
+
+// --------------------------------------------------
+// Main comparison
+// --------------------------------------------------
+
+function runOffspringDistributionComparison() {
+
+    clearODC();
+
+    var poissonResult =
+        ODC_simulate("poisson");
+
+    var nbResult =
+        ODC_simulate("negativeBinomial");
+
+    ODC_drawPanel(
+        "ODCP",
+        poissonResult,
+        0, 0,
+        "Poisson offspring distribution",
+        70, 110, 210,
+        ODC_lambda
+    );
+
+    ODC_drawPanel(
+        "ODCN",
+        nbResult,
+        16, 0,
+        "Negative binomial offspring distribution",
+        220, 90, 90,
+        ODC_sigma2
+    );
+
+    ggbApplet.evalCommand(
+        'ODCCaption = Text("Same mean offspring number, different spread of family sizes.",(0,-3.0))'
+    );
+    ODC_hideLabel("ODCCaption");
+
+    ggbApplet.evalCommand(
+        'ODCCaption2 = Text("Poisson has variance equal to the mean; negative binomial can have much larger variance.",(0,-4.0))'
+    );
+    ODC_hideLabel("ODCCaption2");
+}
+
+
+// --------------------------------------------------
+// Optional presets
+// --------------------------------------------------
+
+function setODCExample1() {
+    ODC_lambda = 1.04;
+    ODC_sigma2 = 2.00;
+}
+
+function setODCExample2() {
+    ODC_lambda = 1.20;
+    ODC_sigma2 = 3.50;
+}
+`;
+
+    const blenderCode = "";
+
+    const buttonInstructions =
+`GeoGebra setup
+
+Paste the generated code into:
+
+Settings
+→ Scripting
+→ Global JavaScript
+
+
+Create button:
+
+Run offspring comparison
+
+On Click JavaScript:
+
+runOffspringDistributionComparison();
+
+
+Create button:
+
+Run again
+
+On Click JavaScript:
+
+runOffspringDistributionComparison();
+
+
+Create button:
+
+Clear
+
+On Click JavaScript:
+
+clearODC();
+
+
+Optional preset buttons:
+
+Example 1
+setODCExample1();
+runOffspringDistributionComparison();
+
+Example 2
+setODCExample2();
+runOffspringDistributionComparison();
+
+
+Default parameters are:
+
+ODC_lambda = 1.04
+ODC_sigma2 = 2.00
+ODC_samples = 1000
+ODC_maxK = 8
+`;
+
+    setOutputs(
+        commands,
+        code,
+        blenderCode,
+        buttonInstructions
+    );
 }
