@@ -71,14 +71,16 @@ const framework = {
 
     stochastic: {
         "Branching Processes": [
-            { value: "galtonWatson", label: "Galton-Watson Tree" },
-            { value: "cellBranchingCombined", label: "Biological Cell Branching: Tree + Statistics" },
-            { value: "birthDeathProcess", label: "Continuous-Time Birth-Death Process" },
-            { value: "birthDeathStats", label: "Birth-Death Extinction Statistics" },
-            { value: "birthDeathSamplePaths", label: "Birth-Death Sample Paths" },
-            { value: "gwPopulationDemo", label: "Galton-Watson Population Demo" },
-            { value: "offspringDistributionComparison", label: "Offspring Distribution: Poisson vs Negative Binomial" },
-        ],
+        { value: "galtonWatson", label: "Galton-Watson Tree" },
+        { value: "cellBranchingCombined", label: "Biological Cell Branching: Tree + Statistics" },
+        { value: "birthDeathProcess", label: "Continuous-Time Birth-Death Process" },
+        { value: "birthDeathStats", label: "Birth-Death Extinction Statistics" },
+        { value: "birthDeathSamplePaths", label: "Birth-Death Sample Paths" },
+        { value: "gwPopulationDemo", label: "Galton-Watson Population Demo" },
+        { value: "offspringDistributionComparison", label: "Offspring Distribution: Poisson vs Negative Binomial" },
+        { value: "gwBranchingDistributionComparison", label: "GW Branching: Poisson vs Negative Binomial" },
+        { value: "offspringDistributionExample", label: "Offspring Distribution Example" }
+        ]
     },
 
     transformations: {
@@ -105,6 +107,7 @@ const framework = {
             { value: "geneticDriftGWAlleles", label: "Genetic Drift: Galton-Watson Alleles" },
             { value: "geneticDriftGWComparison", label: "GW Allele Drift: κ Comparison" },
             { value: "geneticDriftGWVarianceComparison", label: "GW Allele Drift: Poisson vs Negative Binomial" },
+            { value: "alleleLineageSelection", label: "Allele Lineage Selection" }
         ],
 
         "Epidemiology": [
@@ -451,12 +454,18 @@ function updateObjectPanel() {
         generateGeoGebraGeneticDriftBranching();
     } else if (objectType === "geneticDriftGWAlleles") {
         // No special input panel yet.
+    } else if (objectType === "alleleLineageSelection") {
+        // No special input panel yet.
     } else if (objectType === "geneticDriftGWComparison") {
         // No special input panel yet.
     } else if (objectType === "geneticDriftGWVarianceComparison") {
         // No special input panel yet.
     } else if (objectType === "offspringDistributionComparison") {
-        // No special input panel yet.
+    // No special input panel yet.
+    } else if (objectType === "gwBranchingDistributionComparison") {
+        // No special input panel required.
+    } else if (objectType === "offspringDistributionExample") {
+        // No special input panel required.
     } else {
         document.getElementById("placeholderPanel").style.display = "block";
     }
@@ -589,6 +598,12 @@ function generateCode() {
         generateGeoGebraOffspringDistributionComparison();
     } else if (objectType === "geneticDriftGWVarianceComparison") {
         generateGeoGebraGWVarianceComparison();
+    } else if (objectType === "alleleLineageSelection") {
+        generateGeoGebraAlleleLineageSelection();
+    } else if (objectType === "offspringDistributionExample") {
+        generateGeoGebraOffspringDistributionExample();
+    } else if (objectType === "gwBranchingDistributionComparison") {
+        generateGeoGebraGWBranchingDistributionComparison();
     } else {
         setOutputs("Generator not yet implemented for this object.");
     }
@@ -1896,6 +1911,11 @@ function updateDescription() {
             formula = "A Galton-Watson-style allele branching model in which each lineage has a random number of descendants. The total lineage size may grow, shrink, or become extinct.";
         break;
 
+        case "gwBranchingDistributionComparison":
+            text =
+        "Compares two Galton-Watson branching trees with the same mean offspring number but different offspring variance. The Poisson tree has relatively even reproduction, while the negative-binomial tree can show greater variation in family size.";
+        break;
+
         default:
             text = "";
     }
@@ -2254,6 +2274,13 @@ function updatePreviews() {
                 "<p>Blender preview not yet available for this object.</p>";
         break;
 
+        case "alleleLineageSelection":
+            geoGebraPreview =
+                '<img src="media/alleleLineageSelection.png" ' +
+                'alt="GeoGebra allele lineage selection and Galton-Watson branching transition preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+        break;
 
         case "geneticDriftGWAlleles":
             geoGebraPreview =
@@ -2271,7 +2298,23 @@ function updatePreviews() {
             blenderPreview =
             "<p>Blender preview not yet available for this object.</p>";
         break;
+        
+                case "offspringDistributionComparison":
+            geoGebraPreview =
+                '<img src="media/offspringDistributionComparison.png" ' +
+                'alt="GeoGebra Poisson versus Negative Binomial offspring distribution comparison preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+        break;
 
+
+        case "geneticDriftGWVarianceComparison":
+            geoGebraPreview =
+                '<img src="media/gwAlleleDriftPoissonVsNegativeBinomial.png" ' +
+                'alt="GeoGebra Galton-Watson allele drift Poisson versus Negative Binomial comparison preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+        break;
 
         case "gwPopulationDemo":
             geoGebraPreview =
@@ -2280,6 +2323,15 @@ function updatePreviews() {
             blenderPreview =
                 "<p>Blender preview not yet available for this object.</p>";
          break;
+
+        case "offspringDistributionExample":
+            geoGebraPreview =
+                '<img src="media/offspringDistributionExample.png" ' +
+                'alt="GeoGebra example offspring distribution preview">';
+            blenderPreview =
+                "<p>Blender preview not yet available for this object.</p>";
+        break;
+        
 
         case "epidemicBranching":
             geoGebraPreview =
@@ -2396,6 +2448,11 @@ function updateFormula() {
 
         case "geneticDriftBranching":
         formula = "Each offspring allele copy chooses one source allele copy at random from the previous generation. Descendant counts are random but constrained to sum to the fixed population size.";
+        break;
+
+        case "gwBranchingDistributionComparison":
+        formula =
+        "Both trees use the same mean offspring number λ. For Poisson offspring, σ² = λ. For negative-binomial offspring, σ² can be greater than λ, producing more variable family sizes.";
         break;
 
         case "geneticDriftBranchingAncestry":
@@ -11951,9 +12008,13 @@ function clearGeneticDriftBranching() {
         try {
             var obj = ggbApplet.getObjectName(i);
 
-            if (obj.indexOf("GDB") === 0) {
+            if (
+                obj.indexOf("GDB") === 0 ||
+                obj.indexOf("ABL") === 0
+            ) {
                 ggbApplet.deleteObject(obj);
             }
+
         } catch(e) {}
     }
 
@@ -12132,27 +12193,121 @@ function updateGDBText() {
         status = "extinct early";
     }
 
-    // var x = 6.2;
-    // var y = 6.8;
     var x = -4.0;
-    var y = 22.0;
+    var y = 20.0;
     var dy = 0.8;
 
     gdbWriteText("GDBTextTitle", "Genetic Drift", x, y);
     gdbWriteText("GDBTextSubtitle", "Branching Lineage", x, y - dy);
     gdbWriteText("GDBTextModel", "Lineage-level model", x, y - 2 * dy);
 
-    gdbWriteText("GDBTextMean", "Mean descendants: " + Number(meanOffspring.toFixed(2)), x, y - 3.2 * dy);
+    try {
+        ggbApplet.setColor("GDBTextTitle", 210, 70, 55);
+        ggbApplet.setColor("GDBTextSubtitle", 80, 80, 80);
+        ggbApplet.setColor("GDBTextModel", 80, 80, 80);
+    } catch(e) {}
 
-    gdbWriteText("GDBTextP0", "p0 no descendants " + GDB.p0, x, y - 4.2 * dy);
-    gdbWriteText("GDBTextP1", "p1 one descendant " + GDB.p1, x, y - 5.2 * dy);
-    gdbWriteText("GDBTextP2", "p2 two descendants " + GDB.p2, x, y - 6.2 * dy);
+    gdbWriteText("GDBTextBranches", "Total branches: " + GDB.branchCount, x, y - 5.5 * dy);
+    gdbWriteText("GDBTextFinal", "Final copies: " + GDB.finalPopulation, x, y - 4.5 * dy);
+    gdbWriteText("GDBTextStatus", "Status: " + status, x, y - 3.5 * dy);
 
-    gdbWriteText("GDBTextBranches", "Total branches: " + GDB.branchCount, x, y - 7.5 * dy);
-    gdbWriteText("GDBTextFinal", "Final copies: " + GDB.finalPopulation, x, y - 8.5 * dy);
-    gdbWriteText("GDBTextStatus", "Status: " + status, x, y - 9.5 * dy);
+    gdbWriteText("GDBTextIdea", "Chance shapes one allele lineage", x, y - 6.6 * dy);
+    try {
+        ggbApplet.setColor("GDBTextIdea", 45, 145, 135);
+    } catch(e) {}
+}
 
-    gdbWriteText("GDBTextIdea", "Chance shapes one allele lineage", x, y - 10.8 * dy);
+function ABL_drawOffspringInset(p0, p1, p2) {
+
+    var baseX = 10.8;
+    var baseY = 10.2;
+    var scaleY = 5.6;
+
+    var probs = [p0, p1, p2];
+    var xs = [13.4, 15.2, 17.0];
+
+    ggbApplet.evalCommand(
+        'ABLInsetTitle = Text("Offspring distribution",(12.3,13.6))'
+    );
+    try {
+        ggbApplet.setColor("ABLInsetTitle", 60, 60, 60);
+    } catch(e) {}
+
+    ggbApplet.evalCommand(
+        'ABLInsetXAxis = Segment((12.8,10.2),(17.8,10.2))'
+    );
+
+    ggbApplet.evalCommand(
+        'ABLInsetYAxis = Segment((12.8,10.2),(12.8,13.0))'
+    );
+
+    try {
+        ggbApplet.setLabelVisible("ABLInsetXAxis", false);
+        ggbApplet.setLabelVisible("ABLInsetYAxis", false);
+    } catch(e) {}
+
+    for (var i = 0; i < 3; i++) {
+
+        var topY = baseY + probs[i] * scaleY;
+        var barName = "ABLBar" + i;
+
+        ggbApplet.evalCommand(
+            barName +
+            " = Segment((" +
+            xs[i] + "," +
+            baseY + "),(" +
+            xs[i] + "," +
+            topY.toFixed(3) + "))"
+        );
+
+        try {
+            ggbApplet.setColor(barName, 70, 110, 210);
+            ggbApplet.setLineThickness(barName, 12);
+            ggbApplet.setLabelVisible(barName, false);
+        } catch(e) {}
+
+        ggbApplet.evalCommand(
+            'ABLXLabel' + i +
+            ' = Text("' +
+            i +
+            '",(' +
+            (xs[i] - 0.15).toFixed(2) +
+            ',9.55))'
+        );
+
+        ggbApplet.evalCommand(
+            'ABLPercent' + i +
+            ' = Text("' +
+            Math.round(probs[i] * 100) +
+            '%",(' +
+            (xs[i] - 0.35).toFixed(2) +
+            ',' +
+            (topY + 0.50).toFixed(2) +
+            '))'
+        );
+
+        try {
+                ggbApplet.setColor("ABLPercent" + i, 70, 110, 210);
+         } catch(e) {}
+    }
+
+    ggbApplet.evalCommand(
+        'ABLXTitle = Text("Number of offspring",(13.4,8.9))'
+    );
+
+    var lambda = p1 + 2 * p2;
+
+    ggbApplet.evalCommand(
+        'ABLMean = Text("Mean offspring number  λ = ' +
+        lambda.toFixed(2) +
+        '",(12.3,8.1))'
+    );
+
+    try {
+        ggbApplet.setLabelVisible("ABLInsetTitle", false);
+        ggbApplet.setLabelVisible("ABLXTitle", false);
+        ggbApplet.setLabelVisible("ABLMean", false);
+    } catch(e) {}
 }
 
 function drawGDBFrequencyPlot() {
@@ -12410,6 +12565,11 @@ function runGeneticDriftBranching() {
         gdbSetTextValue("GDBReachedFinalText", "no");
     }
     updateGDBText();
+        ABL_drawOffspringInset(
+        GDB.p0,
+        GDB.p1,
+        GDB.p2
+    );
 }
     
 function runGeneticDriftBranchingStats() {
@@ -12496,6 +12656,7 @@ clearGeneticDriftBranching();
 
     setOutputs(commands, code, "", buttonInstructions);
 }
+
 
 function generateGeoGebraGeneticDriftGrid() {
 
@@ -12877,6 +13038,8 @@ function drawGDFrequencyPlot() {
     var y0 = -8.5;
     var plotWidth = 39;
     var plotHeight = 6;
+    var freqMax = 0.7;
+    var freqScale = plotHeight / freqMax;
 
     var maxIndex = Math.max(1, gdFrequencyHistory.length - 1);
 
@@ -13332,6 +13495,7 @@ function updateGDBText() {
             );
         }
     }
+
     
         ggbApplet.evalCommand(
         'GDBTextExplanation1 = Text("Each random sample from the current generation creates one offspring", (0, ' +
@@ -14148,11 +14312,17 @@ function clearGWPopulation() {
     GWP_populationHistory = [];
 
     var textNames = [
-        "GWPTitle",
-        "GWPSummary1",
-        "GWPSummary2",
-        "GWPSummary3",
-        "GWPSummary4"
+    "GWPTitle",
+    "GWPStartLabel",
+    "GWPFinalLabel",
+    "GWPPlotNote",
+    "GWPXAxisTitle",
+    "GWPYAxisTitle",
+    "GWPSummary1",
+    "GWPSummary2",
+    "GWPRegimeText",
+    "GWPSummary3",
+    "GWPSummary4"
     ];
 
     for (var j = 0; j < textNames.length; j++) {
@@ -14385,9 +14555,10 @@ function GWP_drawPopulationPlot() {
 
     for (var i = 0; i < n; i++) {
 
-        if (GWP_populationHistory[i] >
-            maxPop) {
-
+        if (
+            GWP_populationHistory[i] >
+            maxPop
+        ) {
             maxPop =
                 GWP_populationHistory[i];
         }
@@ -14396,9 +14567,114 @@ function GWP_drawPopulationPlot() {
 
     var plotX = 10;
     var plotY = 0;
-    var plotWidth = 8;
+
+    var plotWidth = 9;
     var plotHeight = 6;
 
+
+    // --------------------------------------------------
+    // Title
+    // --------------------------------------------------
+
+    ggbApplet.evalCommand(
+        'GWPTitle = Text("Population size through generations",(10,9.5))'
+    );
+
+    GWP_hideLabel("GWPTitle");
+
+
+    // --------------------------------------------------
+    // Axes
+    // --------------------------------------------------
+
+    ggbApplet.evalCommand(
+        "GWPXAxis = Segment((" +
+        plotX + "," +
+        plotY + "),(" +
+        (plotX + plotWidth) + "," +
+        plotY + "))"
+    );
+
+    ggbApplet.evalCommand(
+        "GWPYAxis = Segment((" +
+        plotX + "," +
+        plotY + "),(" +
+        plotX + "," +
+        (plotY + plotHeight) + "))"
+    );
+
+    try {
+
+        ggbApplet.setColor(
+            "GWPXAxis",
+            160, 160, 160
+        );
+
+        ggbApplet.setColor(
+            "GWPYAxis",
+            160, 160, 160
+        );
+
+        ggbApplet.setLineThickness(
+            "GWPXAxis",
+            1
+        );
+
+        ggbApplet.setLineThickness(
+            "GWPYAxis",
+            1
+        );
+
+    } catch (e) {}
+
+    GWP_hideLabel("GWPXAxis");
+    GWP_hideLabel("GWPYAxis");
+
+    GWP_register("GWPXAxis");
+    GWP_register("GWPYAxis");
+
+
+    // --------------------------------------------------
+    // Initial population reference line
+    // --------------------------------------------------
+
+    var initialPop =
+        GWP_populationHistory[0];
+
+    var initialY =
+        plotY +
+        (initialPop / maxPop) *
+        plotHeight;
+
+    ggbApplet.evalCommand(
+        "GWPInitialRef = Segment((" +
+        plotX.toFixed(4) + "," +
+        initialY.toFixed(4) + "),(" +
+        (plotX + plotWidth).toFixed(4) + "," +
+        initialY.toFixed(4) + "))"
+    );
+
+    try {
+
+        ggbApplet.setColor(
+            "GWPInitialRef",
+            210, 210, 210
+        );
+
+        ggbApplet.setLineThickness(
+            "GWPInitialRef",
+            1
+        );
+
+    } catch (e) {}
+
+    GWP_hideLabel("GWPInitialRef");
+    GWP_register("GWPInitialRef");
+
+
+    // --------------------------------------------------
+    // Population path
+    // --------------------------------------------------
 
     for (var j = 0; j < n - 1; j++) {
 
@@ -14412,11 +14688,13 @@ function GWP_drawPopulationPlot() {
             ((j + 1) / (n - 1)) *
             plotWidth;
 
+
         var y1 =
             plotY +
             (GWP_populationHistory[j] /
              maxPop) *
             plotHeight;
+
 
         var y2 =
             plotY +
@@ -14424,8 +14702,10 @@ function GWP_drawPopulationPlot() {
              maxPop) *
             plotHeight;
 
+
         var name =
             "GWPPopPlot_" + j;
+
 
         ggbApplet.evalCommand(
             name +
@@ -14436,7 +14716,9 @@ function GWP_drawPopulationPlot() {
             y2.toFixed(4) + "))"
         );
 
+
         try {
+
             ggbApplet.setColor(
                 name,
                 70, 110, 180
@@ -14446,18 +14728,155 @@ function GWP_drawPopulationPlot() {
                 name,
                 3
             );
+
         } catch (e) {}
+
 
         GWP_hideLabel(name);
         GWP_register(name);
     }
 
 
+    // --------------------------------------------------
+    // Point markers
+    // --------------------------------------------------
+
+    for (var k = 0; k < n; k++) {
+
+        var px =
+            plotX +
+            (k / (n - 1)) *
+            plotWidth;
+
+
+        var py =
+            plotY +
+            (GWP_populationHistory[k] /
+             maxPop) *
+            plotHeight;
+
+
+        var pointName =
+            "GWPPopPoint_" + k;
+
+
+        ggbApplet.evalCommand(
+            pointName +
+            " = (" +
+            px.toFixed(4) + "," +
+            py.toFixed(4) + ")"
+        );
+
+
+        try {
+
+            ggbApplet.setColor(
+                pointName,
+                70, 110, 180
+            );
+
+            ggbApplet.setPointSize(
+                pointName,
+                4
+            );
+
+        } catch (e) {}
+
+
+        GWP_hideLabel(pointName);
+        GWP_register(pointName);
+    }
+
+
+    // --------------------------------------------------
+    // X-axis labels: generations
+    // --------------------------------------------------
+
+    for (var g = 0; g < n; g++) {
+
+        var gx =
+            plotX +
+            (g / (n - 1)) *
+            plotWidth;
+
+
+        var labelName =
+            "GWPGenLabel_" + g;
+
+
+        ggbApplet.evalCommand(
+            labelName +
+            ' = Text("' +
+            g +
+            '",(' +
+            (gx - 0.15).toFixed(4) + ',' +
+            (plotY - 0.7).toFixed(4) +
+            '))'
+        );
+
+
+        GWP_hideLabel(labelName);
+        GWP_register(labelName);
+    }
+
+
+    // --------------------------------------------------
+    // Axis titles
+    // --------------------------------------------------
+
     ggbApplet.evalCommand(
-        'GWPTitle = Text("Population size through generations",(10,7.6))'
+        'GWPXAxisTitle = Text("Generation",(12.5, -2.3))'
     );
 
-    GWP_hideLabel("GWPTitle");
+    ggbApplet.evalCommand(
+        'GWPYAxisTitle = Text("Population size",(7.3,6.8))'
+    );
+
+    GWP_hideLabel("GWPXAxisTitle");
+    GWP_hideLabel("GWPYAxisTitle");
+
+    GWP_register("GWPXAxisTitle");
+    GWP_register("GWPYAxisTitle");
+
+
+    // --------------------------------------------------
+    // Start / final labels
+    // --------------------------------------------------
+
+    var finalPop =
+        GWP_populationHistory[n - 1];
+
+
+    ggbApplet.evalCommand(
+    'GWPStartLabel = Text("Start = ' +
+    initialPop +
+    '",(10, -4.1))'
+    );
+
+    ggbApplet.evalCommand(
+    'GWPFinalLabel = Text("Final = ' +
+    finalPop +
+    '",(16, -4.1))'
+    );
+
+
+    GWP_hideLabel("GWPStartLabel");
+    GWP_hideLabel("GWPFinalLabel");
+
+    GWP_register("GWPStartLabel");
+    GWP_register("GWPFinalLabel");
+
+
+    // --------------------------------------------------
+    // Interpretation note
+    // --------------------------------------------------
+
+    ggbApplet.evalCommand(
+    'GWPPlotNote = Text("One random run",(10, -15.3))'
+    );
+
+    GWP_hideLabel("GWPPlotNote");
+    GWP_register("GWPPlotNote");
 }
 
 
@@ -14482,31 +14901,48 @@ function GWP_drawSummary() {
 
 
     ggbApplet.evalCommand(
-        'GWPSummary1 = Text("Initial population = ' +
-        GWP_initialPopulation +
-        '",(10,-3.0))'
+    'GWPSummary1 = Text("Initial population = ' +
+    GWP_initialPopulation +
+    '",(10, -5.7))'
     );
 
     ggbApplet.evalCommand(
-        'GWPSummary2 = Text("Mean offspring lambda = ' +
-        GWP_lambda.toFixed(2) +
-        '",(10,-4.5))'
+    'GWPSummary2 = Text("Mean offspring lambda = ' +
+    GWP_lambda.toFixed(2) +
+    '",(10, -7.6))'
+    );
+
+    var regime = "";
+
+    if (GWP_lambda < 1) {
+        regime = "Subcritical";
+    } else if (GWP_lambda === 1) {
+        regime = "Critical";
+    } else {
+        regime = "Supercritical";
+    }
+
+    ggbApplet.evalCommand(
+        'GWPRegimeText = Text("Regime: ' +
+        regime +
+        '",(10, -10.3))'
     );
 
     ggbApplet.evalCommand(
-        'GWPSummary3 = Text("Final generation = ' +
-        lastGeneration +
-        '   Final population = ' +
-        finalPopulation +
-        '",(10,-6.0))'
+    'GWPSummary3 = Text("Final generation = ' +
+    lastGeneration +
+    '   Final population = ' +
+    finalPopulation +
+    '",(10, -11.8))'
     );
 
     ggbApplet.evalCommand(
-        'GWPSummary4 = Text("Outcome: ' +
-        outcome +
-        '",(10,-8.0))'
+    'GWPSummary4 = Text("Outcome: ' +
+    outcome +
+    '",(10, -13.6))'
     );
 
+    GWP_hideLabel("GWPRegimeText");
     GWP_hideLabel("GWPSummary1");
     GWP_hideLabel("GWPSummary2");
     GWP_hideLabel("GWPSummary3");
@@ -15473,68 +15909,62 @@ function GWAD_drawSummary() {
 
 
     ggbApplet.evalCommand(
-        'GWADText1 = Text("Offspring model = ' +
-        modelText +
-        '",(' +
-        xText.toFixed(2) +
-        ',-3.2))'
-    );
+    'GWADText1 = Text("Offspring model = ' +
+    modelText +
+    '",(' +
+    xText.toFixed(2) +
+    ',-3.2))'
+);
 
+ggbApplet.evalCommand(
+    'GWADText2 = Text("λ = ' +
+    GWAD_lambda.toFixed(3) +
+    '   σ² = ' +
+    sigma2.toFixed(3) +
+    '   κ₀ = ' +
+    kappa0.toFixed(3) +
+    '",(' +
+    xText.toFixed(2) +
+    ',-5.3))'
+);
 
-    ggbApplet.evalCommand(
-        'GWADText2 = Text("Initial population = ' +
-        GWAD_m0 +
-        '   Initial Red frequency = ' +
-        GWAD_x0.toFixed(3) +
-        '",(' +
-        xText.toFixed(2) +
-        ',-8.3))'
-    );
+ggbApplet.evalCommand(
+    'GWADText3 = Text("Initial population = ' +
+    GWAD_m0 +
+    '   Initial Red frequency = ' +
+    GWAD_x0.toFixed(3) +
+    '",(' +
+    xText.toFixed(2) +
+    ',-7.8))'
+);
 
+ggbApplet.evalCommand(
+    'GWADText4 = Text("Final generation = ' +
+    last +
+    '",(' +
+    xText.toFixed(2) +
+    ',-10.1))'
+);
 
-    ggbApplet.evalCommand(
-        'GWADText3 = Text("lambda = ' +
-        GWAD_lambda.toFixed(3) +
-        '   sigma2 = ' +
-        sigma2.toFixed(3) +
-        '",(' +
-        xText.toFixed(2) +
-        ',-6.0))'
-    );
+ggbApplet.evalCommand(
+    'GWADText5 = Text("Final Red = ' +
+    red +
+    '   Final Blue = ' +
+    blue +
+    '   Final total = ' +
+    total +
+    '",(' +
+    xText.toFixed(2) +
+    ',-12.3))'
+);
 
-
-    ggbApplet.evalCommand(
-        'GWADText4 = Text("kappa0 = ' +
-        kappa0.toFixed(3) +
-        '   Final generation = ' +
-        last +
-        '",(' +
-        xText.toFixed(2) +
-        ',-10.5))'
-    );
-
-
-    ggbApplet.evalCommand(
-        'GWADText5 = Text("Final Red = ' +
-        red +
-        '   Final Blue = ' +
-        blue +
-        '   Final total = ' +
-        total +
-        '",(' +
-        xText.toFixed(2) +
-        ',-12.6))'
-    );
-
-
-    ggbApplet.evalCommand(
-        'GWADText6 = Text("Outcome: ' +
-        outcome +
-        '",(' +
-        xText.toFixed(2) +
-        ',-14.7))'
-    );
-
+ggbApplet.evalCommand(
+    'GWADText6 = Text("Outcome: ' +
+    outcome +
+    '",(' +
+    xText.toFixed(2) +
+    ',-14.6))'
+);
 
     GWAD_hideLabel("GWADText1");
     GWAD_hideLabel("GWADText2");
@@ -15542,6 +15972,26 @@ function GWAD_drawSummary() {
     GWAD_hideLabel("GWADText4");
     GWAD_hideLabel("GWADText5");
     GWAD_hideLabel("GWADText6");
+
+    try {
+    // Model heading
+    ggbApplet.setColor("GWADText1", 50, 50, 50);
+
+    // Mathematical parameters
+    ggbApplet.setColor("GWADText2", 180, 90, 40);
+
+    // Initial conditions
+    ggbApplet.setColor("GWADText3", 70, 70, 70);
+
+    // Final generation
+    ggbApplet.setColor("GWADText4", 70, 70, 70);
+
+    // Final Red / Blue counts
+    ggbApplet.setColor("GWADText5", 70, 70, 70);
+
+    // Outcome
+    ggbApplet.setColor("GWADText6", 45, 135, 95);
+    } catch(e) {}
 }
 
 
@@ -15704,7 +16154,7 @@ var GWKC_maxPopulation = 10000;
 var GWKC_regimes = [
 
     {
-        name: "Small kappa",
+        name: "Small κ",
         m0: 20,
         lambda: 1.01,
         xOffset: 0,
@@ -15712,7 +16162,7 @@ var GWKC_regimes = [
     },
 
     {
-        name: "Transition kappa",
+        name: "Transition κ",
         m0: 40,
         lambda: 1.02,
         xOffset: 0,
@@ -15720,7 +16170,7 @@ var GWKC_regimes = [
     },
 
     {
-        name: "Large kappa",
+        name: "Large κ",
         m0: 200,
         lambda: 1.02,
         xOffset: 0,
@@ -15890,6 +16340,14 @@ function GWKC_drawPanel(regime, regimeIndex) {
     var panelX = regime.xOffset;
     var panelY = regime.yOffset;
 
+    var titleY = panelY + 11.2;
+    var parameterY = panelY + 9.0;
+
+    var stats1Y = panelY - 2.2;
+    var stats2Y = panelY - 3.2;
+    var stats3Y = panelY - 4.2;
+    var stats4Y = panelY - 5.2;
+
     var plotWidth = 55;
     var plotHeight = 8;
 
@@ -15911,20 +16369,20 @@ function GWKC_drawPanel(regime, regimeIndex) {
         regime.name +
         '",( ' +
         panelX.toFixed(2) +
-        ',' + (panelY + 10.2).toFixed(2) + '))'
+        ',' + (panelY + 11.0).toFixed(2) + '))'
     );
 
     ggbApplet.evalCommand(
-        'GWKCKappa' + regimeIndex +
-        ' = Text("kappa0 = ' +
-        kappa.toFixed(3) +
-        '   m0 = ' +
-        regime.m0 +
-        '   lambda = ' +
-        regime.lambda.toFixed(2) +
-        '",( ' +
-        panelX.toFixed(2) +
-        ',' + (panelY + 9.2).toFixed(2) + '))'
+    'GWKCKappa' + regimeIndex +
+    ' = Text("κ₀ = ' +
+    kappa.toFixed(3) +
+    '   m₀ = ' +
+    regime.m0 +
+    '   λ = ' +
+    regime.lambda.toFixed(2) +
+    '",(' +
+    panelX.toFixed(2) +
+    ',' + parameterY.toFixed(2) + '))'
     );
 
     GWKC_hideLabel("GWKCTitle" + regimeIndex);
@@ -16272,7 +16730,7 @@ var GWVC_panels = [
         model: "negativeBinomial",
         sigma2: GWVC_nbSigma2,
         xOffset: 0,
-        yOffset: -18
+        yOffset: -21
     }
 ];
 
@@ -16538,6 +16996,15 @@ function GWVC_drawPanel(panel, panelIndex) {
 
     var panelX = panel.xOffset;
     var panelY = panel.yOffset;
+    
+   var titleY = panelY + 11.2;
+    var info1Y = panelY + 10.1;
+    var info2Y = panelY + 9.0;
+
+    var stats1Y = panelY - 2.0;
+    var stats2Y = panelY - 3.0;
+    var stats3Y = panelY - 4.0;
+    var stats4Y = panelY - 5.0;
 
     var plotWidth = 52;
     var plotHeight = 8;
@@ -16554,34 +17021,34 @@ function GWVC_drawPanel(panel, panelIndex) {
     // ----------------------------------------------
 
     ggbApplet.evalCommand(
-        'GWVCTitle' + panelIndex +
-        ' = Text("' + panel.name + '",(' +
-        panelX.toFixed(2) + ',' +
-        (panelY + 10.3).toFixed(2) + '))'
+    'GWVCTitle' + panelIndex +
+    ' = Text("' + panel.name + '",(' +
+    panelX.toFixed(2) + ',' +
+    titleY.toFixed(2) + '))'
+    );
+
+   ggbApplet.evalCommand(
+    'GWVCInfo1_' + panelIndex +
+    ' = Text("Initial population = ' +
+    GWVC_m0 +
+    '   Initial Red frequency = ' +
+    GWVC_x0.toFixed(3) +
+    '",(' +
+    panelX.toFixed(2) + ',' +
+    info1Y.toFixed(2) + '))'
     );
 
     ggbApplet.evalCommand(
-        'GWVCInfo1_' + panelIndex +
-        ' = Text("Initial population = ' +
-        GWVC_m0 +
-        '   Initial Red frequency = ' +
-        GWVC_x0.toFixed(3) +
-        '",(' +
-        panelX.toFixed(2) + ',' +
-        (panelY + 9.2).toFixed(2) + '))'
-    );
-
-    ggbApplet.evalCommand(
-        'GWVCInfo2_' + panelIndex +
-        ' = Text("lambda = ' +
-        GWVC_lambda.toFixed(3) +
-        '   sigma2 = ' +
-        sigma2.toFixed(3) +
-        '   kappa0 = ' +
-        kappa0.toFixed(3) +
-        '",(' +
-        panelX.toFixed(2) + ',' +
-        (panelY + 8.1).toFixed(2) + '))'
+    'GWVCInfo2_' + panelIndex +
+    ' = Text("λ = ' +
+    GWVC_lambda.toFixed(3) +
+    '   σ² = ' +
+    sigma2.toFixed(3) +
+    '   κ₀ = ' +
+    kappa0.toFixed(3) +
+    '",(' +
+    panelX.toFixed(2) + ',' +
+    info2Y.toFixed(2) + '))'
     );
 
     GWVC_hideLabel("GWVCTitle" + panelIndex);
@@ -16722,40 +17189,40 @@ function GWVC_drawPanel(panel, panelIndex) {
     // ----------------------------------------------
 
     ggbApplet.evalCommand(
-        'GWVCStats1_' + panelIndex +
-        ' = Text("Red fixed: ' +
-        redFixed +
-        '",(' +
-        panelX.toFixed(2) + ',' +
-        (panelY - 2.0).toFixed(2) + '))'
-    );
+    'GWVCStats1_' + panelIndex +
+    ' = Text("Red fixed: ' +
+    redFixed +
+    '",(' +
+    panelX.toFixed(2) + ',' +
+    stats1Y.toFixed(2) + '))'
+);
 
-    ggbApplet.evalCommand(
-        'GWVCStats2_' + panelIndex +
-        ' = Text("Blue fixed: ' +
-        blueFixed +
-        '",(' +
-        panelX.toFixed(2) + ',' +
-        (panelY - 3.1).toFixed(2) + '))'
-    );
+ggbApplet.evalCommand(
+    'GWVCStats2_' + panelIndex +
+    ' = Text("Blue fixed: ' +
+    blueFixed +
+    '",(' +
+    panelX.toFixed(2) + ',' +
+    stats2Y.toFixed(2) + '))'
+);
 
-    ggbApplet.evalCommand(
-        'GWVCStats3_' + panelIndex +
-        ' = Text("Both present: ' +
-        both +
-        '",(' +
-        panelX.toFixed(2) + ',' +
-        (panelY - 4.2).toFixed(2) + '))'
-    );
+ggbApplet.evalCommand(
+    'GWVCStats3_' + panelIndex +
+    ' = Text("Both present: ' +
+    both +
+    '",(' +
+    panelX.toFixed(2) + ',' +
+    stats3Y.toFixed(2) + '))'
+);
 
-    ggbApplet.evalCommand(
-        'GWVCStats4_' + panelIndex +
-        ' = Text("Population extinct: ' +
-        extinct +
-        '",(' +
-        panelX.toFixed(2) + ',' +
-        (panelY - 5.3).toFixed(2) + '))'
-    );
+ggbApplet.evalCommand(
+    'GWVCStats4_' + panelIndex +
+    ' = Text("Population extinct: ' +
+    extinct +
+    '",(' +
+    panelX.toFixed(2) + ',' +
+    stats4Y.toFixed(2) + '))'
+);
 
     GWVC_hideLabel("GWVCStats1_" + panelIndex);
     GWVC_hideLabel("GWVCStats2_" + panelIndex);
@@ -17165,6 +17632,9 @@ function ODC_drawPanel(panelName, result, panelX, panelY, title, r, g, b, target
     var barStep = 1.2;
     var barWidth = 0.85;
 
+    var freqMax = 0.7;
+    var freqScale = plotHeight / freqMax;
+
     var maxCount = 1;
 
     for (var i = 0; i < result.counts.length; i++) {
@@ -17175,30 +17645,48 @@ function ODC_drawPanel(panelName, result, panelX, panelY, title, r, g, b, target
 
     // Title
     ggbApplet.evalCommand(
-        panelName + 'Title = Text("' + title + '",(' +
-        panelX.toFixed(2) + ',' +
-        (panelY + 8.2).toFixed(2) + '))'
+    panelName + 'Title = Text("' +
+    title +
+    '",(' +
+    panelX.toFixed(2) + ',' +
+    (panelY + 9.2).toFixed(2) +
+    '))'
     );
-    ODC_hideLabel(panelName + "Title");
 
-    // Subtitle
-    ggbApplet.evalCommand(
-        panelName + 'Info1 = Text("lambda = ' +
-        ODC_lambda.toFixed(2) +
-        '   target variance = ' +
-        targetVariance.toFixed(2) +
-        '",(' +
-        panelX.toFixed(2) + ',' +
-        (panelY + 7.3).toFixed(2) + '))'
+    try {
+    ggbApplet.setColor(
+        panelName + "Title",
+        r, g, b
     );
+} catch(e) {}
+
+    ggbApplet.evalCommand(
+    panelName + 'Info1 = Text("λ = ' +
+    ODC_lambda.toFixed(2) +
+    '   σ² = ' +
+    targetVariance.toFixed(2) +
+    '",(' +
+    panelX.toFixed(2) + ',' +
+    (panelY + 8.3).toFixed(2) +
+    '))'
+);
+
+
     ODC_hideLabel(panelName + "Info1");
+
+    try {
+    ggbApplet.setColor(
+        panelName + "Info1",
+        180, 90, 40
+    );
+} catch(e) {}
 
     ggbApplet.evalCommand(
     panelName + 'Y1 = Text("Relative frequency",(' +
-    panelX.toFixed(2) + ',' +
-    (panelY + plotHeight + 0.4).toFixed(2) + '))'
+    (panelX - 1.6).toFixed(2) + ',' +
+    (panelY + 7.4).toFixed(2) +
+    '))'
     );
-    ODC_hideLabel(panelName + "Info2");
 
     // Axes
     var plotWidth = barStep * (ODC_maxK + 1);
@@ -17231,6 +17719,53 @@ function ODC_drawPanel(panelName, result, panelX, panelY, title, r, g, b, target
         220, 220, 220, 1
     );
 
+    var freqLevels = [
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7
+];
+
+for (var f = 0; f < freqLevels.length; f++) {
+
+    var freq = freqLevels[f];
+
+    var fy =
+        panelY +
+        freq * freqScale;
+
+    var refName =
+        panelName + "FreqRef" + f;
+
+    ODC_drawSegment(
+        refName,
+        panelX,
+        fy,
+        panelX + plotWidth,
+        fy,
+        225, 225, 225,
+        1
+    );
+
+    var labelName =
+        panelName + "FreqLabel" + f;
+
+    ggbApplet.evalCommand(
+        labelName +
+        ' = Text("' +
+        freq.toFixed(1) +
+        '",(' +
+        (panelX - 1.1).toFixed(2) + ',' +
+        fy.toFixed(2) +
+        '))'
+    );
+
+    ODC_hideLabel(labelName);
+}
+
     // Bars and labels
     for (var k = 0; k <= ODC_maxK; k++) {
 
@@ -17242,7 +17777,7 @@ function ODC_drawPanel(panelName, result, panelX, panelY, title, r, g, b, target
         result.counts[k] / ODC_samples;
 
          var barHeight =
-             proportion * 20;
+            proportion * freqScale;
 
         ODC_drawBar(
             panelName + "Bar" + k,
@@ -17271,12 +17806,6 @@ function ODC_drawPanel(panelName, result, panelX, panelY, title, r, g, b, target
     );
     ODC_hideLabel(panelName + "Y0");
 
-    ggbApplet.evalCommand(
-        panelName + 'Y1 = Text("relative count",(' +
-        (panelX - 1.8).toFixed(2) + ',' +
-        (panelY + plotHeight + 0.2).toFixed(2) + '))'
-    );
-    ODC_hideLabel(panelName + "Y1");
 }
 
 
@@ -17318,7 +17847,7 @@ function runOffspringDistributionComparison() {
     ODC_hideLabel("ODCCaption");
 
     ggbApplet.evalCommand(
-        'ODCCaption2 = Text("Poisson has variance equal to the mean; negative binomial can have much larger variance.",(0,-4.0))'
+        'ODCCaption2 = Text("Poisson has variance equal to the mean; negative binomial allows much greater variation in family size.",(0,-4.0))'
     );
     ODC_hideLabel("ODCCaption2");
 }
@@ -17395,6 +17924,2681 @@ ODC_lambda = 1.04
 ODC_sigma2 = 2.00
 ODC_samples = 1000
 ODC_maxK = 8
+`;
+
+    setOutputs(
+        commands,
+        code,
+        blenderCode,
+        buttonInstructions
+    );
+}
+
+function generateGeoGebraAlleleLineageSelection() {
+
+    const commands =
+`// Allele Lineage Selection
+// Transitional visual from Part 1 to Part 2.
+//
+// Shows a 12-copy Red/Blue population,
+// selects one Red and one Blue allele copy,
+// fades the others, then leaves the selected
+// copies as roots for two branching lineages.`;
+
+    const code =
+`// --------------------------------------------------
+// Allele Lineage Selection
+// --------------------------------------------------
+
+var ALS_count = 12;
+
+var ALS_spacing = 1.35;
+var ALS_startX = 0;
+var ALS_rowY = 6;
+
+var ALS_rootY = 1.5;
+var ALS_childY1 = -1.0;
+var ALS_childY2 = -3.4;
+var ALS_randomChildY3 = -5.8;
+
+var ALS_offspringProbabilities = [
+    0.25,   // 0 offspring
+    0.5,   // 1 offspring
+    0.15,   // 2 offspring
+    0.10    // 3 offspring
+];
+
+var ALS_selectedRed = 0;
+var ALS_selectedBlue = 8;
+
+var ALS_objects = [];
+
+var ALS_randomGenerationY = [-5.8, -8.4, -11.0, -13.6, -16.2];
+var ALS_currentGeneration = [];
+var ALS_randomGenerationStep = 0;
+var ALS_randomFamilyCounter = 0;
+
+var ALS_randomZoneHalfWidth = 4.5;
+
+var ALS_randomStartY = -5.8;
+var ALS_randomVerticalGap = 2.6;
+
+var ALS_currentGeneration = [];
+var ALS_randomGenerationStep = 0;
+var ALS_randomFamilyCounter = 0;
+// --------------------------------------------------
+// Fixed Part-1-style population
+//
+// 0 = Red
+// 1 = Blue
+//
+// 3 Red, 9 Blue
+// --------------------------------------------------
+
+var ALS_colours = [
+    0, 0,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    0,
+    1
+];
+
+
+// --------------------------------------------------
+// Utilities
+// --------------------------------------------------
+
+function ALS_hideLabel(name) {
+    try {
+        ggbApplet.setLabelVisible(name, false);
+    } catch (e) {}
+}
+
+
+function ALS_register(name) {
+    ALS_objects.push(name);
+}
+
+
+function clearAlleleLineageSelection() {
+
+    for (var i = 0; i < ALS_objects.length; i++) {
+
+        try {
+            if (ggbApplet.exists(ALS_objects[i])) {
+                ggbApplet.deleteObject(ALS_objects[i]);
+            }
+        } catch (e) {}
+    }
+
+    ALS_objects = [];
+}
+
+
+// --------------------------------------------------
+// Draw one allele copy
+// --------------------------------------------------
+
+function ALS_drawCopy(name, x, y, colourType) {
+
+    ggbApplet.evalCommand(
+        name + " = Circle((" +
+        x.toFixed(4) + "," +
+        y.toFixed(4) +
+        "),0.36)"
+    );
+
+    try {
+
+        if (colourType === 0) {
+            ggbApplet.setColor(name, 220, 50, 50);
+        } else {
+            ggbApplet.setColor(name, 55, 100, 220);
+        }
+
+        ggbApplet.setFilling(name, 0.90);
+        ggbApplet.setLineThickness(name, 3);
+
+    } catch (e) {}
+
+    ALS_hideLabel(name);
+    ALS_register(name);
+}
+
+
+// --------------------------------------------------
+// Initial population
+// --------------------------------------------------
+
+function initialiseAlleleLineageSelection() {
+
+    clearAlleleLineageSelection();
+
+    for (var i = 0; i < ALS_count; i++) {
+
+        var x =
+            ALS_startX +
+            i * ALS_spacing;
+
+        var name =
+            "ALSCopy" + i;
+
+        ALS_drawCopy(
+            name,
+            x,
+            ALS_rowY,
+            ALS_colours[i]
+        );
+    }
+
+
+    ggbApplet.evalCommand(
+        'ALSTitle = Text("Part 1 population: Red and Blue allele copies",(-3.0,10.0))'
+    );
+
+    ALS_hideLabel("ALSTitle");
+    ALS_register("ALSTitle");
+
+
+    ggbApplet.evalCommand(
+        'ALSInstruction = Text("For illustration, follow one Red allele copy and one Blue allele copy.",(-4.0,8.0))'
+    );
+
+    ALS_hideLabel("ALSInstruction");
+    ALS_register("ALSInstruction");
+}
+
+
+// --------------------------------------------------
+// Step 1: highlight selected copies
+// --------------------------------------------------
+
+function selectAlleleLineages() {
+
+    for (var i = 0; i < ALS_count; i++) {
+
+        var name = "ALSCopy" + i;
+
+        try {
+
+            if (
+                i === ALS_selectedRed ||
+                i === ALS_selectedBlue
+            ) {
+
+                ggbApplet.setFilling(name, 1.0);
+                ggbApplet.setLineThickness(name, 7);
+
+            } else {
+
+                ggbApplet.setFilling(name, 0.20);
+                ggbApplet.setLineThickness(name, 2);
+            }
+
+        } catch (e) {}
+    }
+
+
+    var redX =
+        ALS_startX +
+        ALS_selectedRed *
+        ALS_spacing;
+
+
+    var blueX =
+        ALS_startX +
+        ALS_selectedBlue *
+        ALS_spacing;
+
+
+    // Highlight rings
+    ggbApplet.evalCommand(
+        "ALSRedRing = Circle((" +
+        redX.toFixed(4) + "," +
+        ALS_rowY.toFixed(4) +
+        "),0.55)"
+    );
+
+    ggbApplet.evalCommand(
+        "ALSBlueRing = Circle((" +
+        blueX.toFixed(4) + "," +
+        ALS_rowY.toFixed(4) +
+        "),0.55)"
+    );
+
+
+    try {
+
+        ggbApplet.setColor(
+            "ALSRedRing",
+            220, 50, 50
+        );
+
+        ggbApplet.setColor(
+            "ALSBlueRing",
+            55, 100, 220
+        );
+
+        ggbApplet.setLineThickness(
+            "ALSRedRing",
+            5
+        );
+
+        ggbApplet.setLineThickness(
+            "ALSBlueRing",
+            5
+        );
+
+        ggbApplet.setFilling(
+            "ALSRedRing",
+            0
+        );
+
+        ggbApplet.setFilling(
+            "ALSBlueRing",
+            0
+        );
+
+    } catch (e) {}
+
+
+    ALS_hideLabel("ALSRedRing");
+    ALS_hideLabel("ALSBlueRing");
+
+    ALS_register("ALSRedRing");
+    ALS_register("ALSBlueRing");
+
+
+    ggbApplet.evalCommand(
+        'ALSSelectedText = Text("Selected Red and Blue allele lineages",(-3.0,3.5))'
+    );
+
+    ALS_hideLabel("ALSSelectedText");
+    ALS_register("ALSSelectedText");
+}
+
+
+// --------------------------------------------------
+// Step 2: fade unselected copies completely
+// --------------------------------------------------
+
+function isolateAlleleLineages() {
+
+    try {
+    ggbApplet.setVisible("ALSInstruction", false);
+    ggbApplet.setVisible("ALSSelectedText", false);
+    } catch (e) {}
+
+    for (var i = 0; i < ALS_count; i++) {
+
+        if (
+            i !== ALS_selectedRed &&
+            i !== ALS_selectedBlue
+        ) {
+
+            try {
+                ggbApplet.setVisible(
+                    "ALSCopy" + i,
+                    false
+                );
+            } catch (e) {}
+        }
+    }
+
+
+    try {
+
+        if (ggbApplet.exists("ALSRedRing")) {
+            ggbApplet.deleteObject("ALSRedRing");
+        }
+
+        if (ggbApplet.exists("ALSBlueRing")) {
+            ggbApplet.deleteObject("ALSBlueRing");
+        }
+
+    } catch (e) {}
+
+
+    ALS_createRoots();
+}
+
+
+// --------------------------------------------------
+// Step 3: create branching roots
+// --------------------------------------------------
+
+function ALS_createRoots() {
+
+    var redX =
+        ALS_startX +
+        ALS_selectedRed *
+        ALS_spacing;
+
+
+    var blueX =
+        ALS_startX +
+        ALS_selectedBlue *
+        ALS_spacing;
+
+    var rootY = ALS_rootY;
+
+
+    // Guide lines
+    ggbApplet.evalCommand(
+        "ALSRedGuide = Segment((" +
+        redX.toFixed(4) + "," +
+        ALS_rowY.toFixed(4) + "),(" +
+        redX.toFixed(4) + "," +
+        rootY.toFixed(4) + "))"
+    );
+
+
+    ggbApplet.evalCommand(
+        "ALSBlueGuide = Segment((" +
+        blueX.toFixed(4) + "," +
+        ALS_rowY.toFixed(4) + "),(" +
+        blueX.toFixed(4) + "," +
+        rootY.toFixed(4) + "))"
+    );
+
+    try {
+        ggbApplet.setLineStyle("ALSRedGuide", 2);
+        ggbApplet.setLineStyle("ALSBlueGuide", 2);
+
+        ggbApplet.setLineThickness("ALSRedGuide", 2);
+        ggbApplet.setLineThickness("ALSBlueGuide", 2);
+    } catch (e) {}
+
+    try {
+
+        ggbApplet.setColor(
+            "ALSRedGuide",
+            150, 150, 150
+        );
+
+        ggbApplet.setColor(
+            "ALSBlueGuide",
+            150, 150, 150
+        );
+
+        ggbApplet.setLineThickness(
+            "ALSRedGuide",
+            3
+        );
+
+        ggbApplet.setLineThickness(
+            "ALSBlueGuide",
+            3
+        );
+
+    } catch (e) {}
+
+
+    ALS_hideLabel("ALSRedGuide");
+    ALS_hideLabel("ALSBlueGuide");
+
+    ALS_register("ALSRedGuide");
+    ALS_register("ALSBlueGuide");
+
+
+    // Root copies
+    ALS_drawCopy(
+        "ALSRedRoot",
+        redX,
+        rootY,
+        0
+    );
+
+    ALS_drawCopy(
+        "ALSBlueRoot",
+        blueX,
+        rootY,
+        1
+    );
+
+
+    ggbApplet.evalCommand(
+        'ALSRootText = Text("These become the roots of two Galton-Watson branching lineages.",(-3.0,-1.3))'
+    );
+
+    ALS_hideLabel("ALSRootText");
+    ALS_register("ALSRootText");
+}
+
+function ALS_drawDescendantBranch(
+    lineName,
+    childName,
+    parentX,
+    parentY,
+    childX,
+    childY,
+    colourType
+) {
+
+    ggbApplet.evalCommand(
+        lineName + " = Segment((" +
+        parentX.toFixed(4) + "," +
+        parentY.toFixed(4) + "),(" +
+        childX.toFixed(4) + "," +
+        childY.toFixed(4) + "))"
+    );
+
+    try {
+        if (colourType === 0) {
+            ggbApplet.setColor(lineName, 220, 50, 50);
+        } else {
+            ggbApplet.setColor(lineName, 55, 100, 220);
+        }
+        ggbApplet.setLineThickness(lineName, 2);
+    } catch (e) {}
+
+    ALS_hideLabel(lineName);
+    ALS_register(lineName);
+
+    ALS_drawCopy(
+        childName,
+        childX,
+        childY,
+        colourType
+    );
+}
+
+function ALS_createFirstDescendants() {
+
+    // Hide earlier explanatory text to reduce clutter
+    try {
+        ggbApplet.setVisible("ALSInstruction", false);
+        ggbApplet.setVisible("ALSSelectedText", false);
+        ggbApplet.setVisible("ALSRootText", false);
+    } catch (e) {}
+
+    var redX =
+        ALS_startX +
+        ALS_selectedRed * ALS_spacing;
+
+    var blueX =
+        ALS_startX +
+        ALS_selectedBlue * ALS_spacing;
+
+    var rootY = ALS_rootY;
+    var childY = ALS_childY1;
+
+    // ------------------------------------------
+    // Red root -> 2 red descendants
+    // ------------------------------------------
+    ALS_drawDescendantBranch(
+        "ALSRedBranch1",
+        "ALSRedChild1",
+        redX, rootY,
+        redX - 1.2, childY,
+        0
+    );
+
+    ALS_drawDescendantBranch(
+        "ALSRedBranch2",
+        "ALSRedChild2",
+        redX, rootY,
+        redX + 1.2, childY,
+        0
+    );
+
+    // ------------------------------------------
+    // Blue root -> 3 blue descendants
+    // ------------------------------------------
+    ALS_drawDescendantBranch(
+        "ALSBlueBranch1",
+        "ALSBlueChild1",
+        blueX, rootY,
+        blueX - 1.6, childY,
+        1
+    );
+
+    ALS_drawDescendantBranch(
+        "ALSBlueBranch2",
+        "ALSBlueChild2",
+        blueX, rootY,
+        blueX, childY,
+        1
+    );
+
+    ALS_drawDescendantBranch(
+        "ALSBlueBranch3",
+        "ALSBlueChild3",
+        blueX, rootY,
+        blueX + 1.6, childY,
+        1
+    );
+
+    // Caption
+    ggbApplet.evalCommand(
+        'ALSDescText = Text("The first descendant generation appears. Red descendants remain Red; Blue descendants remain Blue.",(-6.0,-3.2))'
+    );
+
+    ALS_hideLabel("ALSDescText");
+    ALS_register("ALSDescText");
+}
+
+function ALS_createSecondDescendants() {
+
+    // Hide earlier caption to reduce clutter
+    try {
+        ggbApplet.setVisible("ALSDescText", false);
+    } catch (e) {}
+
+    var redX =
+        ALS_startX +
+        ALS_selectedRed * ALS_spacing;
+
+    var blueX =
+        ALS_startX +
+        ALS_selectedBlue * ALS_spacing;
+
+    var childY1 = ALS_childY1;
+    var childY2 = ALS_childY2;
+    
+
+    // ------------------------------------------
+    // First-generation child positions
+    // ------------------------------------------
+
+    var red1X = redX - 1.2;
+    var red2X = redX + 1.2;
+
+    var blue1X = blueX - 1.6;
+    var blue2X = blueX;
+    var blue3X = blueX + 1.6;
+
+    // ------------------------------------------
+    // Red side
+    // RedChild1 -> 1 descendant
+    // RedChild2 -> 2 descendants
+    // ------------------------------------------
+
+    ALS_drawDescendantBranch(
+        "ALSRedG2Branch1",
+        "ALSRedG2Child1",
+        red1X, childY1,
+        red1X - 0.2, childY2,
+        0
+    );
+
+    ALS_drawDescendantBranch(
+        "ALSRedG2Branch2",
+        "ALSRedG2Child2",
+        red2X, childY1,
+        red2X - 0.65, childY2,
+        0
+    );
+
+    ALS_drawDescendantBranch(
+        "ALSRedG2Branch3",
+        "ALSRedG2Child3",
+        red2X, childY1,
+        red2X + 0.65, childY2,
+        0
+    );
+
+    // ------------------------------------------
+    // Blue side
+    // BlueChild1 -> 1 descendant
+    // BlueChild2 -> 1 descendant
+    // BlueChild3 -> 2 descendants
+    // ------------------------------------------
+
+    ALS_drawDescendantBranch(
+        "ALSBlueG2Branch1",
+        "ALSBlueG2Child1",
+        blue1X, childY1,
+        blue1X - 0.25, childY2,
+        1
+    );
+
+    ALS_drawDescendantBranch(
+        "ALSBlueG2Branch2",
+        "ALSBlueG2Child2",
+        blue2X, childY1,
+        blue2X, childY2,
+        1
+    );
+
+    ALS_drawDescendantBranch(
+        "ALSBlueG2Branch3",
+        "ALSBlueG2Child3",
+        blue3X, childY1,
+        blue3X - 0.45, childY2,
+        1
+    );
+
+    ALS_drawDescendantBranch(
+        "ALSBlueG2Branch4",
+        "ALSBlueG2Child4",
+        blue3X, childY1,
+        blue3X + 0.45, childY2,
+        1
+    );
+
+    // Caption
+    ggbApplet.evalCommand(
+        'ALSDescText2 = Text("A second descendant generation appears. Different allele copies can produce different numbers of descendants.",(-6.0,-5.8))'
+    );
+
+    ALS_hideLabel("ALSDescText2");
+    ALS_register("ALSDescText2");
+}
+
+function ALS_randomOffspringCount() {
+
+    var u = Math.random();
+
+    var cumulative = 0;
+
+    for (var k = 0; k < ALS_offspringProbabilities.length; k++) {
+
+        cumulative += ALS_offspringProbabilities[k];
+
+        if (u <= cumulative) {
+            return k;
+        }
+    }
+
+    return ALS_offspringProbabilities.length - 1;
+}
+
+function ALS_spreadPositions(count, xMin, xMax) {
+
+    var positions = [];
+
+    if (count <= 0) {
+        return positions;
+    }
+
+    if (count === 1) {
+        positions.push((xMin + xMax) / 2);
+        return positions;
+    }
+
+    var step =
+        (xMax - xMin) /
+        (count - 1);
+
+    for (var i = 0; i < count; i++) {
+        positions.push(
+            xMin + i * step
+        );
+    }
+
+    return positions;
+}
+
+
+function ALS_buildNextRandomGeneration(
+    parentList,
+    childY
+) {
+
+    var redRecords = [];
+    var blueRecords = [];
+
+    // ------------------------------------------
+    // First decide offspring counts
+    // ------------------------------------------
+
+    for (var p = 0; p < parentList.length; p++) {
+
+        var parent = parentList[p];
+
+        var count =
+            ALS_randomOffspringCount();
+
+        for (var c = 0; c < count; c++) {
+
+            var record = {
+                parentX: parent.x,
+                parentY: parent.y,
+                colourType: parent.colourType
+            };
+
+            if (parent.colourType === 0) {
+                redRecords.push(record);
+            } else {
+                blueRecords.push(record);
+            }
+        }
+    }
+
+    var redCentre =
+    ALS_startX +
+    ALS_selectedRed * ALS_spacing;
+
+    var blueCentre =
+    ALS_startX +
+    ALS_selectedBlue * ALS_spacing;
+
+    var redZoneMin =
+    redCentre - ALS_randomZoneHalfWidth;
+
+    var redZoneMax =
+    redCentre + ALS_randomZoneHalfWidth;
+
+    var blueZoneMin =
+    blueCentre - ALS_randomZoneHalfWidth;
+
+    var blueZoneMax =
+    blueCentre + ALS_randomZoneHalfWidth;
+
+    // ------------------------------------------
+    // Spread each colour across its own zone
+    // ------------------------------------------
+
+    var redPositions =
+    ALS_spreadPositions(
+        redRecords.length,
+        redZoneMin,
+        redZoneMax
+    );
+
+    var bluePositions =
+        ALS_spreadPositions(
+        blueRecords.length,
+        blueZoneMin,
+        blueZoneMax
+    );
+
+
+    var nextGeneration = [];
+
+
+    // ------------------------------------------
+    // Draw Red descendants
+    // ------------------------------------------
+
+    for (var r = 0; r < redRecords.length; r++) {
+
+        var childX =
+            redPositions[r];
+
+        var familyId =
+            ALS_randomFamilyCounter++;
+
+        var branchName =
+            "ALSRandomRedBranch_" +
+            familyId;
+
+        var childName =
+            "ALSRandomRedChild_" +
+            familyId;
+
+        ALS_drawDescendantBranch(
+            branchName,
+            childName,
+            redRecords[r].parentX,
+            redRecords[r].parentY,
+            childX,
+            childY,
+            0
+        );
+
+        nextGeneration.push({
+            name: childName,
+            x: childX,
+            y: childY,
+            colourType: 0
+        });
+    }
+
+
+    // ------------------------------------------
+    // Draw Blue descendants
+    // ------------------------------------------
+
+    for (var b = 0; b < blueRecords.length; b++) {
+
+        var childX =
+            bluePositions[b];
+
+        var familyId2 =
+            ALS_randomFamilyCounter++;
+
+        var branchName2 =
+            "ALSRandomBlueBranch_" +
+            familyId2;
+
+        var childName2 =
+            "ALSRandomBlueChild_" +
+            familyId2;
+
+        ALS_drawDescendantBranch(
+            branchName2,
+            childName2,
+            blueRecords[b].parentX,
+            blueRecords[b].parentY,
+            childX,
+            childY,
+            1
+        );
+
+        nextGeneration.push({
+            name: childName2,
+            x: childX,
+            y: childY,
+            colourType: 1
+        });
+    }
+
+
+    return nextGeneration;
+}
+
+function ALS_updatePopulationText() {
+
+    var redCount = 0;
+    var blueCount = 0;
+
+    for (var i = 0; i < ALS_currentGeneration.length; i++) {
+
+        if (ALS_currentGeneration[i].colourType === 0) {
+            redCount++;
+        } else {
+            blueCount++;
+        }
+    }
+
+    var total = redCount + blueCount;
+
+    var redFrequency =
+        total > 0
+        ? redCount / total
+        : 0;
+
+    try {
+        if (ggbApplet.exists("ALSPopulationText")) {
+            ggbApplet.deleteObject("ALSPopulationText");
+        }
+    } catch (e) {}
+
+    ggbApplet.evalCommand(
+        'ALSPopulationText = Text("Random generation ' +
+        ALS_randomGenerationStep +
+        '   Red = ' +
+        redCount +
+        '   Blue = ' +
+        blueCount +
+        '   Total = ' +
+        total +
+        '   Red frequency = ' +
+        redFrequency.toFixed(3) +
+        '",(-8.0,7.8))'
+    );
+
+    ALS_hideLabel("ALSPopulationText");
+    ALS_register("ALSPopulationText");
+}
+
+
+function ALS_createRandomThirdGeneration() {
+
+    try {
+        ggbApplet.setVisible("ALSDescText2", false);
+    } catch (e) {}
+
+    try {
+        if (ggbApplet.exists("ALSRandomText")) {
+            ggbApplet.deleteObject("ALSRandomText");
+        }
+    } catch (e) {}
+
+    var redX =
+        ALS_startX +
+        ALS_selectedRed * ALS_spacing;
+
+    var blueX =
+        ALS_startX +
+        ALS_selectedBlue * ALS_spacing;
+
+    var childY2 = ALS_childY2;
+    var childY3 = ALS_randomGenerationY[0];
+
+    // These must match the actual second-generation positions
+    var secondGenerationParents = [
+
+        // Red side
+        {
+            name: "ALSRedG2Child1",
+            x: redX - 1.2,
+            y: childY2,
+            colourType: 0
+        },
+        {
+            name: "ALSRedG2Child2",
+            x: redX + 0.55,
+            y: childY2,
+            colourType: 0
+        },
+        {
+            name: "ALSRedG2Child3",
+            x: redX + 1.85,
+            y: childY2,
+            colourType: 0
+        },
+
+        // Blue side
+        {
+            name: "ALSBlueG2Child1",
+            x: blueX - 1.85,
+            y: childY2,
+            colourType: 1
+        },
+        {
+            name: "ALSBlueG2Child2",
+            x: blueX,
+            y: childY2,
+            colourType: 1
+        },
+        {
+            name: "ALSBlueG2Child3",
+            x: blueX + 0.95,
+            y: childY2,
+            colourType: 1
+        },
+        {
+            name: "ALSBlueG2Child4",
+            x: blueX + 2.25,
+            y: childY2,
+            colourType: 1
+        }
+    ];
+
+    ALS_currentGeneration =
+    ALS_buildNextRandomGeneration(
+        secondGenerationParents,
+        ALS_randomStartY
+    );
+
+    ALS_randomGenerationStep = 1;
+
+    ALS_updateTitleForBranching();
+
+
+    ggbApplet.evalCommand(
+        'ALSRandomText = Text("From this generation onward, each allele copy produces a random number of descendants.",(-6.5, -9.0))'
+    );
+
+    ALS_hideLabel("ALSRandomText");
+    ALS_register("ALSRandomText");
+}
+
+function ALS_updateTitleForBranching() {
+
+    try {
+        if (ggbApplet.exists("ALSTitle")) {
+            ggbApplet.deleteObject("ALSTitle");
+        }
+    } catch (e) {}
+
+    ggbApplet.evalCommand(
+        'ALSTitle = Text("Descendant populations of selected Red and Blue allele lineages",(-6.0,9.5))'
+    );
+
+    ALS_hideLabel("ALSTitle");
+    ALS_register("ALSTitle");
+}
+
+function ALS_createNextRandomGeneration() {
+
+    try {
+        if (ggbApplet.exists("ALSRandomText")) {
+            ggbApplet.deleteObject("ALSRandomText");
+        }
+    } catch (e) {}
+
+    try {
+        if (ggbApplet.exists("ALSRandomText")) {
+            ggbApplet.deleteObject("ALSRandomText");
+        }
+    } catch (e) {}
+
+    if (ALS_currentGeneration.length === 0) {
+
+        ggbApplet.evalCommand(
+            'ALSRandomText = Text("No further descendants appeared: both current lineages have become extinct.",(-0.5,-8.0))'
+        );
+
+        ALS_hideLabel("ALSRandomText");
+        ALS_register("ALSRandomText");
+        return;
+    }
+
+    var nextY =
+    ALS_randomStartY -
+    ALS_randomGenerationStep *
+    ALS_randomVerticalGap;
+
+    ALS_currentGeneration =
+        ALS_buildNextRandomGeneration(
+        ALS_currentGeneration,
+        nextY
+        );
+
+        ALS_randomGenerationStep++;
+        ALS_updatePopulationText();
+
+    if (ALS_currentGeneration.length === 0) {
+
+        ggbApplet.evalCommand(
+            'ALSRandomText = Text("This random generation produced no surviving descendants.",(-0.5,-8.0))'
+        );
+
+    } 
+}
+
+// --------------------------------------------------
+// Complete sequence
+// --------------------------------------------------
+
+function runAlleleLineageSelection() {
+
+    initialiseAlleleLineageSelection();
+
+    selectAlleleLineages();
+}
+
+
+// --------------------------------------------------
+// Reset
+// --------------------------------------------------
+
+function resetAlleleLineageSelection() {
+
+    ALS_currentGeneration = [];
+    ALS_randomGenerationStep = 0;
+    ALS_randomFamilyCounter = 0;
+
+    initialiseAlleleLineageSelection();
+}
+`;
+
+    const blenderCode = "";
+
+    const buttonInstructions =
+`GeoGebra setup
+
+Paste the generated code into:
+
+Settings
+→ Scripting
+→ Global JavaScript
+
+
+Button 1
+
+Caption:
+Initial population
+
+On Click JavaScript:
+
+initialiseAlleleLineageSelection();
+
+
+Button 2
+
+Caption:
+Select lineages
+
+On Click JavaScript:
+
+selectAlleleLineages();
+
+
+Button 3
+
+Caption:
+Create branching roots
+
+On Click JavaScript:
+
+isolateAlleleLineages();
+
+
+Button 4
+
+Caption:
+Reset
+
+On Click JavaScript:
+
+resetAlleleLineageSelection();
+
+
+Button 5
+
+Caption:
+Reset
+
+On Click JavaScript:
+
+resetAlleleLineageSelection();
+
+
+Button 6
+
+Caption:
+Random descendants
+
+On Click JavaScript:
+
+ALS_createRandomThirdGeneration();
+
+
+Button 7
+
+Caption:
+Next random generation
+
+On Click JavaScript:
+
+ALS_createNextRandomGeneration();
+
+
+Button 8
+
+Caption:
+Reset
+
+On Click JavaScript:
+
+resetAlleleLineageSelection();
+`;
+
+    setOutputs(
+        commands,
+        code,
+        blenderCode,
+        buttonInstructions
+    );
+}
+
+function generateGeoGebraOffspringDistributionExample() {
+
+    const commands =
+`// Example Offspring Distribution
+// 0 offspring: 20%
+// 1 offspring: 40%
+// 2 offspring: 30%
+// 3 offspring: 10%
+//
+// Mean offspring number:
+// lambda = 1.3`;
+
+    const code =
+`// --------------------------------------------------
+// Example Offspring Distribution
+// --------------------------------------------------
+
+var ODE_objects = [];
+
+
+// --------------------------------------------------
+// Utilities
+// --------------------------------------------------
+
+function ODE_hideLabel(name) {
+    try {
+        ggbApplet.setLabelVisible(name, false);
+    } catch (e) {}
+}
+
+
+function ODE_register(name) {
+    ODE_objects.push(name);
+}
+
+
+function clearOffspringDistributionExample() {
+
+    for (var i = 0; i < ODE_objects.length; i++) {
+
+        try {
+            if (ggbApplet.exists(ODE_objects[i])) {
+                ggbApplet.deleteObject(ODE_objects[i]);
+            }
+        } catch (e) {}
+    }
+
+    ODE_objects = [];
+}
+
+
+// --------------------------------------------------
+// Draw helper
+// --------------------------------------------------
+
+function ODE_drawSegment(
+    name,
+    x1, y1,
+    x2, y2,
+    r, g, b,
+    thickness
+) {
+
+    ggbApplet.evalCommand(
+        name + " = Segment((" +
+        x1.toFixed(3) + "," +
+        y1.toFixed(3) + "),(" +
+        x2.toFixed(3) + "," +
+        y2.toFixed(3) + "))"
+    );
+
+    try {
+        ggbApplet.setColor(name, r, g, b);
+        ggbApplet.setLineThickness(name, thickness);
+    } catch (e) {}
+
+    ODE_hideLabel(name);
+    ODE_register(name);
+}
+
+
+// --------------------------------------------------
+// Main display
+// --------------------------------------------------
+
+function runOffspringDistributionExample() {
+
+    clearOffspringDistributionExample();
+
+    var probabilities = [
+        0.20,
+        0.40,
+        0.30,
+        0.10
+    ];
+
+    var plotX = 2;
+    var plotY = 1;
+
+    var plotWidth = 8;
+    var plotHeight = 6;
+
+    var maxProbability = 0.50;
+
+    var scaleY =
+        plotHeight / maxProbability;
+
+
+    // --------------------------------------------------
+    // Title
+    // --------------------------------------------------
+
+    ggbApplet.evalCommand(
+        'ODETitle = Text("Example offspring distribution",(2,9.0))'
+    );
+
+    ODE_hideLabel("ODETitle");
+    ODE_register("ODETitle");
+
+
+    ggbApplet.evalCommand(
+        'ODESubtitle = Text("Each individual randomly produces 0, 1, 2 or 3 offspring.",(2,8.0))'
+    );
+
+    ODE_hideLabel("ODESubtitle");
+    ODE_register("ODESubtitle");
+
+
+    // --------------------------------------------------
+    // Axes
+    // --------------------------------------------------
+
+    ODE_drawSegment(
+        "ODEAxisX",
+        plotX,
+        plotY,
+        plotX + plotWidth,
+        plotY,
+        120, 120, 120,
+        1
+    );
+
+    ODE_drawSegment(
+        "ODEAxisY",
+        plotX,
+        plotY,
+        plotX,
+        plotY + plotHeight,
+        120, 120, 120,
+        1
+    );
+
+
+    // --------------------------------------------------
+    // Horizontal probability guides
+    // --------------------------------------------------
+
+    var levels = [
+        0.1,
+        0.2,
+        0.3,
+        0.4,
+        0.5
+    ];
+
+    for (var i = 0; i < levels.length; i++) {
+
+        var level =
+            levels[i];
+
+        var y =
+            plotY +
+            level * scaleY;
+
+        var lineName =
+            "ODEGuide" + i;
+
+        ODE_drawSegment(
+            lineName,
+            plotX,
+            y,
+            plotX + plotWidth,
+            y,
+            225, 225, 225,
+            1
+        );
+
+        var textName =
+            "ODEProbLabel" + i;
+
+        ggbApplet.evalCommand(
+            textName +
+            ' = Text("' +
+            level.toFixed(1) +
+            '",(' +
+            (plotX - 0.9).toFixed(2) + ',' +
+            y.toFixed(2) +
+            '))'
+        );
+
+        ODE_hideLabel(textName);
+        ODE_register(textName);
+    }
+
+
+    // --------------------------------------------------
+    // Bars
+    // --------------------------------------------------
+
+    var xPositions = [
+        3.2,
+        5.0,
+        6.8,
+        8.6
+    ];
+
+    for (var k = 0; k < probabilities.length; k++) {
+
+        var barHeight =
+            probabilities[k] *
+            scaleY;
+
+        var barName =
+            "ODEBar" + k;
+
+        ODE_drawSegment(
+            barName,
+            xPositions[k],
+            plotY,
+            xPositions[k],
+            plotY + barHeight,
+            70, 110, 210,
+            14
+        );
+
+
+        var labelName =
+            "ODEOffspringLabel" + k;
+
+        ggbApplet.evalCommand(
+            labelName +
+            ' = Text("' +
+            k +
+            '",(' +
+            (xPositions[k] - 0.15).toFixed(2) + ',' +
+            (plotY - 0.8).toFixed(2) +
+            '))'
+        );
+
+        ODE_hideLabel(labelName);
+        ODE_register(labelName);
+
+
+        var percentName =
+            "ODEPercent" + k;
+
+        ggbApplet.evalCommand(
+            percentName +
+            ' = Text("' +
+            Math.round(probabilities[k] * 100) +
+            '%",(' +
+            (xPositions[k] - 0.35).toFixed(2) + ',' +
+            (plotY + barHeight + 0.45).toFixed(2) +
+            '))'
+        );
+
+        ODE_hideLabel(percentName);
+        ODE_register(percentName);
+    }
+
+
+    // --------------------------------------------------
+    // Axis labels
+    // --------------------------------------------------
+
+    ggbApplet.evalCommand(
+        'ODEXAxisTitle = Text("Number of offspring",(4.3,-0.4))'
+    );
+
+    ODE_hideLabel("ODEXAxisTitle");
+    ODE_register("ODEXAxisTitle");
+
+
+    ggbApplet.evalCommand(
+    'ODEYAxisTitle = Text("Probability",(0.8,7.5))'
+    );
+
+    ODE_hideLabel("ODEYAxisTitle");
+    ODE_register("ODEYAxisTitle");
+
+
+    // --------------------------------------------------
+    // Mean offspring number
+    // --------------------------------------------------
+
+    var lambda =
+        0 * probabilities[0] +
+        1 * probabilities[1] +
+        2 * probabilities[2] +
+        3 * probabilities[3];
+
+
+    ggbApplet.evalCommand(
+        'ODEMean = Text("Mean offspring number  λ = ' +
+        lambda.toFixed(1) +
+        '",(2,-1.2))'
+    );
+
+    ODE_hideLabel("ODEMean");
+    ODE_register("ODEMean");
+
+
+    ggbApplet.evalCommand(
+        'ODENote = Text("These probabilities form the offspring distribution.",(2,-1.8))'
+    );
+
+    ODE_hideLabel("ODENote");
+    ODE_register("ODENote");
+}
+`;
+
+    const blenderCode = "";
+
+    const buttonInstructions =
+`GeoGebra setup
+
+Paste the generated code into:
+
+Settings
+→ Scripting
+→ Global JavaScript
+
+
+Button 1
+
+Caption:
+Show offspring distribution
+
+On Click JavaScript:
+
+runOffspringDistributionExample();
+
+
+Button 2
+
+Caption:
+Clear
+
+On Click JavaScript:
+
+clearOffspringDistributionExample();
+`;
+
+    setOutputs(
+        commands,
+        code,
+        blenderCode,
+        buttonInstructions
+    );
+}
+
+function generateGeoGebraGWBranchingDistributionComparison() {
+
+    const commands =
+`// GW Branching: Poisson vs Negative Binomial
+//
+// Two Galton-Watson lineage trees.
+// Same mean offspring number, different offspring variance.
+//
+// Paste the generated Global JavaScript into GeoGebra,
+// then create the buttons listed in GeoGebra Button Setup.`;
+
+    const code =
+`// --------------------------------------------------
+// GW Branching: Poisson vs Negative Binomial
+// Same mean, different variance
+// --------------------------------------------------
+
+
+// ==================================================
+// PARAMETERS
+// ==================================================
+
+var GWBD_lambda = 1.20;
+var GWBD_nbSigma2 = 3.50;
+
+var GWBD_generations = 8;
+
+// Safety limits only.
+// They prevent an unusually explosive random run
+// from overwhelming the GeoGebra display.
+var GWBD_maxGenerationSize = 45;
+var GWBD_maxBranches = 250;
+
+var GWBD_panelWidth = 12.5;
+var GWBD_rowGap = 1.8;
+
+var GWBD_leftCentre = 0;
+var GWBD_rightCentre = 18;
+
+// ==================================================
+// RUN-SEQUENCE SETTINGS
+// ==================================================
+
+var GWBD_sequenceRuns = 8;
+var GWBD_lastRunNo = -1;
+
+// GeoGebra animation speed.
+// Speed 1 takes about 10 seconds to traverse the
+// complete slider interval, so 1..8 gives roughly
+// 1.4 seconds per realization.
+var GWBD_sequenceSpeed = 1;
+
+// ==================================================
+// BASIC UTILITIES
+// ==================================================
+
+function GWBD_hideLabel(name) {
+
+    try {
+        ggbApplet.setLabelVisible(name, false);
+    } catch(e) {}
+}
+
+
+function GWBD_clearDisplay() {
+
+    for (
+        var i = ggbApplet.getObjectNumber() - 1;
+        i >= 0;
+        i--
+    ) {
+
+        try {
+
+            var name =
+                ggbApplet.getObjectName(i);
+
+            if (
+                name.indexOf("GWBD") === 0 &&
+                name !== "GWBDRunNo"
+            ) {
+                ggbApplet.deleteObject(name);
+            }
+
+        } catch(e) {}
+    }
+}
+
+
+// ==================================================
+// RANDOM GENERATORS
+// ==================================================
+
+
+// --------------------------------------------------
+// Poisson
+// --------------------------------------------------
+
+function GWBD_poisson(mean) {
+
+    var L = Math.exp(-mean);
+    var k = 0;
+    var p = 1;
+
+    do {
+        k++;
+        p *= Math.random();
+    } while (p > L);
+
+    return k - 1;
+}
+
+
+// --------------------------------------------------
+// Standard normal
+// Used by Gamma generator
+// --------------------------------------------------
+
+function GWBD_standardNormal() {
+
+    var u1 = Math.random();
+    var u2 = Math.random();
+
+    if (u1 <= 0) {
+        u1 = 0.0000001;
+    }
+
+    return (
+        Math.sqrt(-2 * Math.log(u1)) *
+        Math.cos(2 * Math.PI * u2)
+    );
+}
+
+
+// --------------------------------------------------
+// Gamma random variable
+// Marsaglia-Tsang method
+// --------------------------------------------------
+
+function GWBD_gamma(shape, scale) {
+
+    if (
+        shape <= 0 ||
+        scale <= 0
+    ) {
+        return 0;
+    }
+
+    if (shape < 1) {
+
+        var u = Math.random();
+
+        if (u <= 0) {
+            u = 0.0000001;
+        }
+
+        return (
+            GWBD_gamma(
+                shape + 1,
+                scale
+            ) *
+            Math.pow(
+                u,
+                1 / shape
+            )
+        );
+    }
+
+    var d =
+        shape - 1 / 3;
+
+    var c =
+        1 / Math.sqrt(9 * d);
+
+    while (true) {
+
+        var x =
+            GWBD_standardNormal();
+
+        var v =
+            1 + c * x;
+
+        if (v <= 0) {
+            continue;
+        }
+
+        v =
+            v * v * v;
+
+        var u2 =
+            Math.random();
+
+        if (
+            u2 <
+            1 -
+            0.0331 *
+            x * x * x * x
+        ) {
+            return scale * d * v;
+        }
+
+        if (
+            Math.log(u2) <
+            0.5 * x * x +
+            d *
+            (
+                1 -
+                v +
+                Math.log(v)
+            )
+        ) {
+            return scale * d * v;
+        }
+    }
+}
+
+
+// --------------------------------------------------
+// Negative binomial
+// Gamma-Poisson mixture
+// --------------------------------------------------
+
+function GWBD_negativeBinomial(
+    mean,
+    variance
+) {
+
+    if (variance <= mean) {
+        return GWBD_poisson(mean);
+    }
+
+    var shape =
+        (mean * mean) /
+        (variance - mean);
+
+    var scale =
+        (variance - mean) /
+        mean;
+
+    var randomMean =
+        GWBD_gamma(
+            shape,
+            scale
+        );
+
+    return GWBD_poisson(
+        randomMean
+    );
+}
+
+
+// ==================================================
+// OFFSPRING SAMPLER
+// ==================================================
+
+function GWBD_offspring(
+    model,
+    variance
+) {
+
+    if (
+        model ===
+        "negativeBinomial"
+    ) {
+
+        return GWBD_negativeBinomial(
+            GWBD_lambda,
+            variance
+        );
+    }
+
+    return GWBD_poisson(
+        GWBD_lambda
+    );
+}
+
+
+// ==================================================
+// SIMULATE ONE TREE
+//
+// Each entry in a generation stores the index of
+// its parent in the preceding generation.
+// ==================================================
+
+function GWBD_simulateTree(
+    model,
+    variance
+) {
+
+    var levels = [];
+
+    levels.push([
+        {
+            parent: -1
+        }
+    ]);
+
+    var branchCount = 0;
+    var displayLimited = false;
+    var extinct = false;
+
+    for (
+        var generation = 1;
+        generation <= GWBD_generations;
+        generation++
+    ) {
+
+        var previous =
+            levels[
+                levels.length - 1
+            ];
+
+        if (
+            previous.length === 0
+        ) {
+            extinct = true;
+            break;
+        }
+
+        var next = [];
+
+        var stopBuilding = false;
+
+        for (
+            var parentIndex = 0;
+            parentIndex <
+            previous.length;
+            parentIndex++
+        ) {
+
+            var children =
+                GWBD_offspring(
+                    model,
+                    variance
+                );
+
+            for (
+                var child = 0;
+                child < children;
+                child++
+            ) {
+
+                if (
+                    next.length >=
+                    GWBD_maxGenerationSize ||
+                    branchCount >=
+                    GWBD_maxBranches
+                ) {
+
+                    displayLimited = true;
+                    stopBuilding = true;
+                    break;
+                }
+
+                next.push({
+                    parent: parentIndex
+                });
+
+                branchCount++;
+            }
+
+            if (stopBuilding) {
+                break;
+            }
+        }
+
+        levels.push(next);
+
+        if (next.length === 0) {
+            extinct = true;
+            break;
+        }
+
+        if (displayLimited) {
+            break;
+        }
+    }
+
+    var finalLevel =
+        levels[
+            levels.length - 1
+        ];
+
+    var outcome;
+
+    if (displayLimited) {
+
+        outcome =
+            "display limit reached";
+
+    } else if (
+        finalLevel.length === 0
+    ) {
+
+        outcome =
+            "extinct";
+
+    } else if (
+        levels.length - 1 >=
+        GWBD_generations
+    ) {
+
+        outcome =
+            "reached final generation";
+
+    } else {
+
+        outcome =
+            "stopped early";
+    }
+
+    return {
+        levels: levels,
+        branchCount: branchCount,
+        finalCopies:
+            finalLevel.length,
+        finalGeneration:
+            levels.length - 1,
+        outcome: outcome
+    };
+}
+
+
+// ==================================================
+// HORIZONTAL POSITION OF A NODE
+//
+// Every generation is spread across the full
+// panel width. Children are stored in parent order,
+// which helps minimise crossing ancestry lines.
+// ==================================================
+
+function GWBD_nodeX(
+    centre,
+    count,
+    index
+) {
+
+    if (count <= 1) {
+        return centre;
+    }
+
+    var left =
+        centre -
+        GWBD_panelWidth / 2;
+
+    return (
+        left +
+        index *
+        GWBD_panelWidth /
+        (count - 1)
+    );
+}
+
+
+// ==================================================
+// DRAW ONE SEGMENT
+// ==================================================
+
+function GWBD_drawSegment(
+    name,
+    x1,
+    y1,
+    x2,
+    y2,
+    r,
+    g,
+    b
+) {
+
+    ggbApplet.evalCommand(
+        name +
+        " = Segment((" +
+        x1.toFixed(4) + "," +
+        y1.toFixed(4) + "),(" +
+        x2.toFixed(4) + "," +
+        y2.toFixed(4) + "))"
+    );
+
+    try {
+        ggbApplet.setColor(
+            name,
+            r, g, b
+        );
+
+        ggbApplet.setLineThickness(
+            name,
+            3
+        );
+
+        GWBD_hideLabel(name);
+
+    } catch(e) {}
+}
+
+
+// ==================================================
+// DRAW ROOT POINT
+// ==================================================
+
+function GWBD_drawRoot(
+    name,
+    x,
+    y,
+    r,
+    g,
+    b
+) {
+
+    ggbApplet.evalCommand(
+        name +
+        " = (" +
+        x.toFixed(4) + "," +
+        y.toFixed(4) + ")"
+    );
+
+    try {
+        ggbApplet.setColor(
+            name,
+            r, g, b
+        );
+
+        ggbApplet.setPointSize(
+            name,
+            5
+        );
+
+        GWBD_hideLabel(name);
+
+    } catch(e) {}
+}
+
+
+// ==================================================
+// DRAW ONE TREE
+// ==================================================
+
+function GWBD_drawTree(
+    prefix,
+    result,
+    centre,
+    r,
+    g,
+    b
+) {
+
+    GWBD_drawRoot(
+        prefix + "Root",
+        centre,
+        0,
+        r, g, b
+    );
+
+    for (
+        var generation = 1;
+        generation <
+        result.levels.length;
+        generation++
+    ) {
+
+        var previous =
+            result.levels[
+                generation - 1
+            ];
+
+        var current =
+            result.levels[
+                generation
+            ];
+
+        var yParent =
+            -(generation - 1) *
+            GWBD_rowGap;
+
+        var yChild =
+            -generation *
+            GWBD_rowGap;
+
+        for (
+            var childIndex = 0;
+            childIndex <
+            current.length;
+            childIndex++
+        ) {
+
+            var parentIndex =
+                current[
+                    childIndex
+                ].parent;
+
+            var xParent =
+                GWBD_nodeX(
+                    centre,
+                    previous.length,
+                    parentIndex
+                );
+
+            var xChild =
+                GWBD_nodeX(
+                    centre,
+                    current.length,
+                    childIndex
+                );
+
+            GWBD_drawSegment(
+                prefix +
+                "Branch_" +
+                generation +
+                "_" +
+                childIndex,
+
+                xParent,
+                yParent,
+
+                xChild,
+                yChild,
+
+                r, g, b
+            );
+        }
+    }
+}
+
+
+// ==================================================
+// TEXT HELPERS
+// ==================================================
+
+function GWBD_writeText(
+    name,
+    text,
+    x,
+    y,
+    r,
+    g,
+    b
+) {
+
+    var safe =
+        String(text)
+        .replace(/"/g, "'");
+
+    ggbApplet.evalCommand(
+        name +
+        ' = Text("' +
+        safe +
+        '",(' +
+        x.toFixed(2) + ',' +
+        y.toFixed(2) +
+        '))'
+    );
+
+    try {
+
+        GWBD_hideLabel(name);
+
+        ggbApplet.setColor(
+            name,
+            r, g, b
+        );
+
+    } catch(e) {}
+}
+
+
+// ==================================================
+// DRAW PANEL TEXT
+// ==================================================
+
+function GWBD_drawPanelText(
+    prefix,
+    centre,
+    title,
+    variance,
+    result,
+    r,
+    g,
+    b
+) {
+
+    var x =
+        centre -
+        GWBD_panelWidth / 2;
+
+    GWBD_writeText(
+        prefix + "Title",
+        title,
+        x,
+        5.0,
+        r, g, b
+    );
+
+    GWBD_writeText(
+        prefix + "Parameters",
+        "λ = " +
+        GWBD_lambda.toFixed(2) +
+        "   σ² = " +
+        variance.toFixed(2),
+
+        x,
+        4.0,
+
+        180, 90, 40
+    );
+
+    GWBD_writeText(
+        prefix + "Stats1",
+        "Final generation = " +
+        result.finalGeneration +
+        "   Final copies = " +
+        result.finalCopies,
+
+        x,
+        3.0,
+
+        60, 60, 60
+    );
+
+    GWBD_writeText(
+        prefix + "Stats2",
+        "Total branches = " +
+        result.branchCount +
+        "   Outcome: " +
+        result.outcome,
+
+        x,
+        2.1,
+
+        60, 60, 60
+    );
+}
+
+
+// ==================================================
+// MAIN COMPARISON
+// ==================================================
+
+function runGWBranchingDistributionComparison() {
+
+    GWBD_clearDisplay();
+
+    var poissonVariance =
+        GWBD_lambda;
+
+    var poissonResult =
+        GWBD_simulateTree(
+            "poisson",
+            poissonVariance
+        );
+
+    var nbResult =
+        GWBD_simulateTree(
+            "negativeBinomial",
+            GWBD_nbSigma2
+        );
+
+
+    // Left: Poisson
+    GWBD_drawTree(
+        "GWBDP",
+        poissonResult,
+        GWBD_leftCentre,
+        70, 110, 210
+    );
+
+    GWBD_drawPanelText(
+        "GWBDP",
+        GWBD_leftCentre,
+        "Poisson branching",
+        poissonVariance,
+        poissonResult,
+        70, 110, 210
+    );
+
+
+    // Right: Negative binomial
+    GWBD_drawTree(
+        "GWBDN",
+        nbResult,
+        GWBD_rightCentre,
+        220, 90, 90
+    );
+
+    GWBD_drawPanelText(
+        "GWBDN",
+        GWBD_rightCentre,
+        "Negative binomial branching",
+        GWBD_nbSigma2,
+        nbResult,
+        220, 90, 90
+    );
+
+
+    GWBD_writeText(
+        "GWBDCaption",
+        "Same mean offspring number, different reproductive variation.",
+        -6.0,
+        -16.4,
+        50, 50, 50
+    );
+}
+
+function GWBD_clear() {
+
+    GWBD_stopSequence();
+
+    try {
+        if (ggbApplet.exists("GWBDRunNo")) {
+
+            ggbApplet.unregisterObjectUpdateListener(
+                "GWBDRunNo"
+            );
+
+            ggbApplet.deleteObject(
+                "GWBDRunNo"
+            );
+        }
+    } catch(e) {}
+
+    GWBD_lastRunNo = -1;
+
+    GWBD_clearDisplay();
+}
+
+// ==================================================
+// ANIMATED SEQUENCE OF INDEPENDENT RUNS
+//
+// This sequence uses GeoGebra's native slider animation.
+//
+// A native GeoGebra slider is animated.
+// Every integer update of the slider triggers a new,
+// independent Poisson / negative-binomial comparison.
+// ==================================================
+
+function GWBD_setupSequence() {
+
+    if (!ggbApplet.exists("GWBDRunNo")) {
+
+        ggbApplet.evalCommand(
+            "GWBDRunNo = Slider(1, " +
+            GWBD_sequenceRuns +
+            ", 1, 1, 100, false, true, false, false)"
+        );
+    }
+
+    try {
+        ggbApplet.setVisible(
+            "GWBDRunNo",
+            true
+        );
+
+        ggbApplet.setLabelVisible(
+            "GWBDRunNo",
+            true
+        );
+
+        ggbApplet.setAnimationSpeed(
+            "GWBDRunNo",
+            GWBD_sequenceSpeed
+        );
+
+    } catch(e) {}
+}
+
+
+function GWBD_sequenceUpdate() {
+
+    if (!ggbApplet.exists("GWBDRunNo")) {
+        return;
+    }
+
+    var runNo =
+        Math.round(
+            ggbApplet.getValue(
+                "GWBDRunNo"
+            )
+        );
+
+    if (runNo === GWBD_lastRunNo) {
+        return;
+    }
+
+    GWBD_lastRunNo = runNo;
+
+    // Draw one completely new independent realization.
+    runGWBranchingDistributionComparison();
+
+    GWBD_writeText(
+        "GWBDSequenceText",
+        "Random realization " +
+        runNo +
+        " of " +
+        GWBD_sequenceRuns,
+        -6.0,
+        -15.3,
+        80, 80, 80
+    );
+
+    // Stop after the final requested realization.
+    if (
+        runNo >=
+        GWBD_sequenceRuns
+    ) {
+        GWBD_stopSequence();
+    }
+}
+
+
+function GWBD_startSequence() {
+
+    GWBD_stopSequence();
+
+    GWBD_setupSequence();
+
+    try {
+        ggbApplet.unregisterObjectUpdateListener(
+            "GWBDRunNo"
+        );
+    } catch(e) {}
+
+    ggbApplet.registerObjectUpdateListener(
+        "GWBDRunNo",
+        GWBD_sequenceUpdate
+    );
+
+    GWBD_lastRunNo = -1;
+
+    // Return to realization 1.
+    ggbApplet.setValue(
+        "GWBDRunNo",
+        1
+    );
+
+    // Ensure the first frame is displayed immediately.
+    GWBD_sequenceUpdate();
+
+    try {
+        ggbApplet.setAnimating(
+            "GWBDRunNo",
+            true
+        );
+
+        ggbApplet.setAnimationSpeed(
+            "GWBDRunNo",
+            GWBD_sequenceSpeed
+        );
+
+        ggbApplet.startAnimation();
+
+    } catch(e) {}
+}
+
+
+function GWBD_stopSequence() {
+
+    try {
+
+        if (
+            ggbApplet.exists(
+                "GWBDRunNo"
+            )
+        ) {
+            ggbApplet.setAnimating(
+                "GWBDRunNo",
+                false
+            );
+        }
+
+        ggbApplet.stopAnimation();
+
+    } catch(e) {}
+}
+
+// ==================================================
+// PRESETS
+// ==================================================
+
+function setGWBDExample1() {
+
+    GWBD_lambda = 1.20;
+    GWBD_nbSigma2 = 3.50;
+}
+
+
+function setGWBDExample2() {
+
+    GWBD_lambda = 1.04;
+    GWBD_nbSigma2 = 2.00;
+}
+`;
+
+    const blenderCode = "";
+
+    const buttonInstructions =
+`GeoGebra setup
+
+Paste the generated code into:
+
+Settings
+→ Scripting
+→ Global JavaScript
+
+
+--------------------------------
+Button 1
+--------------------------------
+
+Caption:
+
+Run comparison
+
+On Click JavaScript:
+
+runGWBranchingDistributionComparison();
+
+
+--------------------------------
+Button 2
+--------------------------------
+
+Caption:
+
+Run again
+
+On Click JavaScript:
+
+runGWBranchingDistributionComparison();
+
+
+--------------------------------
+Button 3
+--------------------------------
+
+Caption:
+
+Clear
+
+On Click JavaScript:
+
+GWBD_clear();
+
+--------------------------------
+Button 4
+--------------------------------
+
+Caption:
+
+Run sequence
+
+On Click JavaScript:
+
+GWBD_startSequence();
+
+
+--------------------------------
+Button 5
+--------------------------------
+
+Caption:
+
+Stop sequence
+
+On Click JavaScript:
+
+GWBD_stopSequence();
+
+Sequence mode:
+
+Runs 8 independent random realizations using a GeoGebra animated slider.
+
+Each pair of trees uses exactly the same parameter values.
+
+Only the random offspring outcomes change from frame to frame.
+
+
+--------------------------------
+Optional preset button
+--------------------------------
+
+Caption:
+
+Example 1
+
+On Click JavaScript:
+
+setGWBDExample1();
+runGWBranchingDistributionComparison();
+
+
+--------------------------------
+Optional preset button
+--------------------------------
+
+Caption:
+
+Example 2
+
+On Click JavaScript:
+
+setGWBDExample2();
+runGWBranchingDistributionComparison();
+
+
+Example 1:
+
+λ = 1.20
+
+Poisson:
+σ² = 1.20
+
+Negative binomial:
+σ² = 3.50
+
+
+Example 2:
+
+λ = 1.04
+
+Poisson:
+σ² = 1.04
+
+Negative binomial:
+σ² = 2.00
 `;
 
     setOutputs(
